@@ -11,8 +11,6 @@ jobs:
 
     runs-on: ubuntu-20.04
 
-    if: "!contains(github.event.head_commit.message, '[ci skip]')"
-
     outputs:
       release_id: ${{ steps.create-release.outputs.result }}
 
@@ -41,7 +39,7 @@ jobs:
         run: pnpm i
 
       - name: bump version
-        run: if [ ${GITHUB_REF#refs/heads/} == "production" ]; then pnpm release ; else pnpm release --preRelease=beta; fi
+        run: if [ "${{ vars.STAGE }}" == "production" ]; then pnpm release ; else pnpm release --preRelease=beta; fi
 
       - name: merge with development
         run: |
