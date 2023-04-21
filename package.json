@@ -7,7 +7,8 @@
     "dev:server": "vite",
     "build": "tauri build",
     "build:server": "vite build",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "release": "release-it"
   },
   "license": "MIT",
   "dependencies": {
