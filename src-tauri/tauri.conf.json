@@ -1,0 +1,81 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "build": {
+    "beforeBuildCommand": "pnpm run build:server",
+    "beforeDevCommand": "pnpm run dev:server",
+    "devPath": "http://localhost:2001",
+    "distDir": "../dist"
+  },
+  "package": {
+    "productName": "Lander",
+    "version": "0.2.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "fs": {
+        "scope": ["$RESOURCE/*"]
+      },
+      "globalShortcut": {
+        "all": true
+      },
+      "http": {
+        "request": true,
+        "scope": ["https://**", "http://localhost:2000/*"]
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": ["$APPDATA/**/*"]
+      },
+      "process": {
+        "relaunch": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "category": "Utility",
+      "copyright": "",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": [],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "identifier": "com.lander.Lander",
+      "longDescription": "",
+      "macOS": {
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "resources": ["assets/*"],
+      "shortDescription": "",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
+    },
+    "macOSPrivateApi": true,
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://releases.myapp.com/{{target}}/{{arch}}/{{current_version}}"
+      ],
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM2RjZCMzU3ODI3QzhEQ0MKUldUTWpYeUNWN1AyeGorTzFjdlFXMlBDUFdhY3BhYXpDWDJQY2NkV3hnRVAxVS9Ta3Y4Q05WQW8K",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}
