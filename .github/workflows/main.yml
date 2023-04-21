@@ -11,8 +11,6 @@ jobs:
 
     runs-on: ubuntu-20.04
 
-    if: "!contains(github.event.head_commit.message, '[ci skip]')"
-
     outputs:
       release_id: ${{ steps.create-release.outputs.result }}
 
@@ -29,7 +27,7 @@ jobs:
       - name: setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 6.32.9
+          version: 7.29.1
 
       - name: setup node
         uses: actions/setup-node@v3
@@ -41,9 +39,9 @@ jobs:
         run: pnpm i
 
       - name: bump version
-        run: if [ ${GITHUB_REF#refs/heads/} == "production" ]; then pnpm release ; else pnpm release --preRelease=beta; fi
+        run: if [ "${{ vars.STAGE }}" == "production" ]; then pnpm release ; else pnpm release --preRelease=beta; fi
 
-      - name: Merge with development
+      - name: merge with development
         run: |
           git checkout development
           git merge ${GITHUB_REF#refs/heads/} -m "chore(release): merge $(git describe --tags `git rev-list --tags --max-count=1`) into development"
@@ -86,7 +84,7 @@ jobs:
       - name: setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 6.32.9
+          version: 7.29.1
 
       - name: setup node
         uses: actions/setup-node@v3
