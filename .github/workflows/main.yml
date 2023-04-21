@@ -26,6 +26,11 @@ jobs:
           git config user.name "github_actions"
           git config user.email "developer@lander1.ai"
 
+      - name: setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6.32.9
+
       - name: setup node
         uses: actions/setup-node@v3
         with:
@@ -77,6 +82,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6.32.9
 
       - name: setup node
         uses: actions/setup-node@v3
