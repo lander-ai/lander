@@ -1,6 +1,6 @@
 {
   "name": "lander",
-  "version": "0.3.0",
+  "version": "0.3.1-beta.0",
   "description": "",
   "scripts": {
     "dev": "tauri dev",
