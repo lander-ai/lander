@@ -113,11 +113,29 @@ jobs:
       - name: install node dependencies
         run: pnpm i
 
+      - name: set updater endpoint
+        id: set_updater_endpoint
+        run: |
+          if [ "${{ vars.STAGE }}" = "production" ]; then
+            echo "endpoint=https://lander1.ai/releases/updates/{{target}}/{{arch}}/{{current_version}}" >> $GITHUB_OUTPUT
+          else
+            echo "endpoint=https://stg.lander1.ai/releases/updates/{{target}}/{{arch}}/{{current_version}}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: set target
+        id: set_target
+        run: |
+          if [ "${{ matrix.platform }}" = "macos-latest" ]; then
+            echo "target=universal-apple-darwin" >> $GITHUB_OUTPUT
+          fi
+
       - uses: tauri-apps/tauri-action@v0
         if: matrix.platform == "macos-latest"
         with:
           releaseId: ${{ needs.setup.outputs.release_id }}
-          args: --target universal-apple-darwin
+          args: |
+            --target ${{ steps.set_target.outputs.target }}
+            --config '{"tauri": {"updater": {"endpoints": ["${{ steps.set_updater_endpoint.outputs.endpoint }}"]}}}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_STAGE: ${{ vars.STAGE }}
