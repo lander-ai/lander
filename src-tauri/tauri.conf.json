@@ -71,7 +71,7 @@
       "endpoints": [
         "https://releases.myapp.com/{{target}}/{{arch}}/{{current_version}}"
       ],
-      "dialog": true,
+      "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM2RjZCMzU3ODI3QzhEQ0MKUldUTWpYeUNWN1AyeGorTzFjdlFXMlBDUFdhY3BhYXpDWDJQY2NkV3hnRVAxVS9Ta3Y4Q05WQW8K",
       "windows": {
         "installMode": "passive"
