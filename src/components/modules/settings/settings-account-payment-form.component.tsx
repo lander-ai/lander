@@ -165,7 +165,6 @@ export const SettingsAccountPaymentForm: Component<Props> = (props) => {
         onClick={handleSubmit}
         justifySelf="start"
         mt="32px"
-        px="16px"
       >
         Submit
       </Button>

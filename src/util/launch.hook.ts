@@ -1,5 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 import { batch, createEffect, onMount } from "solid-js";
+import { __dev__ } from "~/constants";
 import { CommandType, User } from "~/models";
 import { useUser } from "~/queries";
 import {
@@ -12,6 +13,7 @@ import { HTTPError, NetworkService } from "~/services/network.service";
 import { commandStore, mouseStore, queryStore, router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { networkStore } from "~/store/network.store";
+import { checkForUpdates } from "./check-for-updates";
 import { getCommandSection, getCommandSections } from "./command-sections";
 
 const installedApplicationsEvent = new EventService(
@@ -113,6 +115,16 @@ export const useLaunch = () => {
     }
 
     await InvokeService.shared.initPanel();
+
+    setInterval(() => {
+      if (__dev__ || isOffline()) {
+        return;
+      }
+
+      if (document.visibilityState === "hidden") {
+        checkForUpdates();
+      }
+    }, 60 * 1000);
 
     listen("fetch_user_response", () => {
       user.refetch();

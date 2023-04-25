@@ -117,6 +117,16 @@ export const SettingsAccountIdentify: Component<Props> = (props) => {
     });
   });
 
+  createEffect(() => {
+    if (view() !== View.Email) {
+      setEmailErrorText(undefined);
+    }
+
+    if (view() !== View.Token) {
+      setEmailErrorText(undefined);
+    }
+  });
+
   return (
     <SWrapper>
       <Button onClick={handleBack} mb="24px">
