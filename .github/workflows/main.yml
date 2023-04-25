@@ -130,7 +130,7 @@ jobs:
           fi
 
       - uses: tauri-apps/tauri-action@v0
-        if: matrix.platform == "macos-latest"
+        if: matrix.platform == 'macos-latest'
         with:
           releaseId: ${{ needs.setup.outputs.release_id }}
           args: |
