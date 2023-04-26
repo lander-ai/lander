@@ -13,7 +13,7 @@ jobs:
           - os: macos-latest
             target: universal-apple-darwin
 
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.platform.os }}
 
     steps:
       - uses: actions/checkout@v3
@@ -38,11 +38,11 @@ jobs:
           workspaces: "./src-tauri -> target"
 
       - name: Install dependencies (macOS)
-        if: matrix.platform.os == 'macos-latest'
+        if: matrix.platform == 'macos-latest'
         run: rustup target add aarch64-apple-darwin
 
       - name: Install dependencies (Ubuntu)
-        if: matrix.platform.os == 'ubuntu-20.04'
+        if: matrix.platform == 'ubuntu-20.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
@@ -58,27 +58,27 @@ jobs:
             pnpm release --preRelease=alpha --no-git.push;
           fi
 
-      - name: Get version
-        run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      - name: Set updater endpoint
+        id: set_updater_endpoint
+        run: |
+          if [ "${{ vars.STAGE }}" = "production" ]; then
+            echo "endpoint=https://lander1.ai/releases/updates/{{target}}/{{arch}}/{{current_version}}" >> $GITHUB_OUTPUT
+          else
+            echo "endpoint=https://stg.lander1.ai/releases/updates/{{target}}/{{arch}}/{{current_version}}" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Set updates endpoint
+      - name: Update my-file.json description
         uses: jossef/action-set-json-field@v2.1
         with:
-          file: ./src-tauri/tauri.conf.json
-          field: tauri.updater.endpoints
-          value: ${{ vars.UPDATES_ENDPOINT }}
-
-      - name: Set version
-        uses: jossef/action-set-json-field@v2.1
-        with:
-          file: ./src-tauri/tauri.conf.json
-          field: tauri.package.version
-          value: ${{ env.PACKAGE_VERSION }}
+          file: my-file.json
+          field: description
+          value: my custom data
 
       - name: Build app
         run: >
           pnpm build
           --target: ${{ matrix.platform.target }}
+          --config '{"tauri": {"updater": {"endpoints": ["${{ steps.set_updater_endpoint.outputs.endpoint }}"]}}}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_STAGE: ${{ vars.STAGE }}
@@ -97,9 +97,8 @@ jobs:
         with:
           name: artifacts
           path: |
-            ./src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app.tar.gz
-            ./src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app.tar.gz.sig
-            ./src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+            ./src-tauri/target/universal-apple-darwin/bundle/macos/*
+            ./src-tauri/target/universal-apple-darwin/bundle/dmg/*
 
   publish:
     needs: build
