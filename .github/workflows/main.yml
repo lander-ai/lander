@@ -68,7 +68,7 @@ jobs:
         with:
           file: ./src-tauri/tauri.conf.json
           field: tauri.updater.endpoints
-          value: "[${{ vars.UPDATES_ENDPOINT }}]"
+          value: '["${{ vars.UPDATES_ENDPOINT }}"]'
 
       - name: Build app
         run: pnpm build --target ${{ matrix.platform.target }}
