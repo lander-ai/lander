@@ -57,7 +57,7 @@ jobs:
           if [ "${{ vars.STAGE }}" == "production" ]; then 
             pnpm release
           else 
-            pnpm release --preRelease=alpha
+            pnpm release --preRelease=preview
           fi
 
       - name: Get version
@@ -70,6 +70,14 @@ jobs:
           field: tauri.updater.endpoints
           value: '["${{ vars.UPDATES_ENDPOINT }}"]'
           parse_json: true
+
+      - name: Set app name (staging)
+        if: vars.STAGE == 'staging'
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: ./src-tauri/tauri.conf.json
+          field: tauri.package.productName
+          value: "Lander (Preview)"
 
       - name: Build app
         run: pnpm build --target ${{ matrix.platform.target }}
@@ -134,7 +142,7 @@ jobs:
           if [ "${{ vars.STAGE }}" == "production" ]; then
             pnpm release
           else 
-            pnpm release --preRelease=alpha
+            pnpm release --preRelease=preview
           fi
 
       - name: Get version
@@ -151,7 +159,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
           tag_name: v${{ env.PACKAGE_VERSION }}
-          prerelease: ${{ vars.STAGE == 'production' }}
+          prerelease: ${{ vars.STAGE != 'production' }}
           draft: true
           files: "./artifacts/**/*"
 
