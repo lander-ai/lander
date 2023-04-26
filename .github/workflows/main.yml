@@ -12,56 +12,53 @@ jobs:
     runs-on: ubuntu-20.04
 
     outputs:
-      release_id: ${{ steps.create-release.outputs.result }}
+      release_id: ${{ steps.get-release.outputs.result }}
 
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: git config
+      - name: Init git config
         run: |
           git config user.name "github_actions"
           git config user.email "developer@lander1.ai"
 
-      - name: setup pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 7.29.1
 
-      - name: setup node
+      - name: Setup NodeJS
         uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: "pnpm"
 
-      - name: install node dependencies
+      - name: Install NodeJS dependencies
         run: pnpm i
 
-      - name: bump version
+      - name: Increment version
         run: if [ "${{ vars.STAGE }}" == "production" ]; then pnpm release ; else pnpm release --preRelease=alpha; fi
 
-      - name: merge with development
+      - name: Merge with development
         run: |
           git checkout development
           git merge ${GITHUB_REF#refs/heads/} -m "chore(release): merge $(git describe --tags `git rev-list --tags --max-count=1`) into development"
           git push origin development
 
-      - name: get version
+      - name: Get version
         run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
-      - name: create release
-        id: create-release
+      - name: Get release
+        id: get-release
         uses: actions/github-script@v6
         with:
           script: |
-            const { data } = await github.rest.repos.createRelease({
+            const { data } = await github.rest.repos.getReleaseByTag({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: `v${process.env.PACKAGE_VERSION}`,
-              name: `Release v${process.env.PACKAGE_VERSION}`,
-              draft: true,
-              prerelease: false
+              tag: ${process.env.PACKAGE_VERSION}
             })
             return data.id
 
@@ -81,39 +78,39 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: setup pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 7.29.1
 
-      - name: setup node
+      - name: Setup NodeJS
         uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: "pnpm"
 
-      - name: install rust stable
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: setup rust cache
+      - name: Setup Rust cache
         uses: swatinem/rust-cache@v2
         with:
           workspaces: "./src-tauri -> target"
 
-      - name: install dependencies (macos)
+      - name: Install dependencies (macOS)
         if: matrix.platform == 'macos-latest'
         run: rustup target add aarch64-apple-darwin
 
-      - name: install dependencies (ubuntu)
+      - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: install node dependencies
+      - name: Install NodeJS dependencies
         run: pnpm i
 
-      - name: set updater endpoint
+      - name: Set updater endpoint
         id: set_updater_endpoint
         run: |
           if [ "${{ vars.STAGE }}" = "production" ]; then
@@ -122,15 +119,15 @@ jobs:
             echo "endpoint=https://stg.lander1.ai/releases/updates/{{target}}/{{arch}}/{{current_version}}" >> $GITHUB_OUTPUT
           fi
 
-      - name: set target
+      - name: Set target
         id: set_target
         run: |
           if [ "${{ matrix.platform }}" = "macos-latest" ]; then
             echo "target=universal-apple-darwin" >> $GITHUB_OUTPUT
           fi
 
-      - uses: tauri-apps/tauri-action@dev
-        if: matrix.platform == 'macos-latest'
+      - name: Build Lander
+        uses: tauri-apps/tauri-action@dev
         with:
           releaseId: ${{ needs.setup.outputs.release_id }}
           args: |
