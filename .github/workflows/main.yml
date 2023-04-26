@@ -15,6 +15,8 @@ jobs:
 
     runs-on: ${{ matrix.platform.os }}
 
+    environment: ${{ vars.ENVIRONMENT_STAGE }}
+
     steps:
       - uses: actions/checkout@v3
 
@@ -106,6 +108,8 @@ jobs:
 
     permissions:
       contents: write
+
+    environment: ${{ vars.ENVIRONMENT_STAGE }}
 
     runs-on: ubuntu-20.04
 
