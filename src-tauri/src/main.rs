@@ -43,6 +43,27 @@ fn main() {
             command::replace_text,
         ])
         .setup(move |app| {
+            #[cfg(not(debug_assertions))]
+            {
+                let updater_app_handler = app.app_handle().clone();
+
+                tauri::async_runtime::spawn(async move {
+                    let builder = tauri::updater::builder(updater_app_handler).target(
+                        if cfg!(target_os = "macos") {
+                            "darwin-universal".to_string()
+                        } else {
+                            tauri::updater::target().unwrap()
+                        },
+                    );
+
+                    if let Ok(update) = builder.check().await {
+                        if update.is_update_available() {
+                            update.download_and_install().await.unwrap();
+                        }
+                    }
+                });
+            }
+
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
