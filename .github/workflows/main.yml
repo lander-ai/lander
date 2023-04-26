@@ -58,7 +58,7 @@ jobs:
             const { data } = await github.rest.repos.getReleaseByTag({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag: ${process.env.PACKAGE_VERSION}
+              tag: process.env.PACKAGE_VERSION
             })
             return data.id
 
