@@ -1,6 +1,7 @@
 import { render } from "solid-js/web";
 import { App } from "./app.component";
 import "./index.css";
+import "./polyfills";
 
 const root = document.getElementById("root");
 
