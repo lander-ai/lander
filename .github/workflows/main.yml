@@ -76,7 +76,7 @@ jobs:
         uses: jossef/action-set-json-field@v2.1
         with:
           file: ./src-tauri/tauri.conf.json
-          field: tauri.package.productName
+          field: package.productName
           value: "Lander (Preview)"
 
       - name: Build app
