@@ -71,6 +71,14 @@ jobs:
           value: '["${{ vars.UPDATES_ENDPOINT }}"]'
           parse_json: true
 
+      - name: Set app name (staging)
+        if: vars.STAGE == 'staging'
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: ./src-tauri/tauri.conf.json
+          field: tauri.package.productName
+          value: "Lander (Preview)"
+
       - name: Build app
         run: pnpm build --target ${{ matrix.platform.target }}
         env:
