@@ -151,7 +151,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
           tag_name: v${{ env.PACKAGE_VERSION }}
-          prerelease: ${{ vars.STAGE == 'production' }}
+          prerelease: ${{ vars.STAGE != 'production' }}
           draft: true
           files: "./artifacts/**/*"
 
