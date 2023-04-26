@@ -78,9 +78,7 @@ jobs:
           value: ${{ env.PACKAGE_VERSION }}
 
       - name: Build app
-        run: >
-          pnpm build
-          --target: ${{ matrix.platform.target }}
+        run: pnpm build --target ${{ matrix.platform.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_STAGE: ${{ vars.STAGE }}
