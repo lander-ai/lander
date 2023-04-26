@@ -9,9 +9,9 @@ export const __prd__ = __stage__ === "production";
 export const __stripe_pk__ = import.meta.env.VITE_STRIPE_PK;
 
 export const __api_endpoint__ = __prd__
-  ? "https://api.lander.ai/api"
+  ? "https://lander1.ai/api"
   : __stg__
-  ? "https://stg.api.lander.ai/api"
+  ? "https://stg.lander1.ai/api"
   : __dev__
   ? "http://localhost:2000/api"
   : (undefined as never);
