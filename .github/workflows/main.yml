@@ -133,7 +133,8 @@ jobs:
         uses: tauri-apps/tauri-action@dev
         with:
           releaseId: ${{ needs.setup.outputs.release_id }}
-          args: |
+          args: >
+            --
             --target ${{ steps.set_target.outputs.target }}
             --config '{"tauri": {"updater": {"endpoints": ["${{ steps.set_updater_endpoint.outputs.endpoint }}"]}}}'
         env:
