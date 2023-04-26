@@ -129,7 +129,7 @@ jobs:
             echo "target=universal-apple-darwin" >> $GITHUB_OUTPUT
           fi
 
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@0300c0cf6d20920d0812a6af9e624aadec51cacd
         if: matrix.platform == 'macos-latest'
         with:
           releaseId: ${{ needs.setup.outputs.release_id }}
