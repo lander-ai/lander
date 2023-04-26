@@ -1,0 +1,150 @@
+name: "Lift off 🚀"
+
+on:
+  push:
+    branches: [production, staging]
+
+jobs:
+  setup:
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-20.04
+
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: git config
+        run: |
+          git config user.name "github_actions"
+          git config user.email "developer@lander1.ai"
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7.29.1
+
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "pnpm"
+
+      - name: install node dependencies
+        run: pnpm i
+
+      - name: bump version
+        run: if [ "${{ vars.STAGE }}" == "production" ]; then pnpm release ; else pnpm release --preRelease=alpha; fi
+
+      - name: merge with development
+        run: |
+          git checkout development
+          git merge ${GITHUB_REF#refs/heads/} -m "chore(release): merge $(git describe --tags `git rev-list --tags --max-count=1`) into development"
+          git push origin development
+
+      - name: get version
+        run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: create release
+        id: create-release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${process.env.PACKAGE_VERSION}`,
+              name: `Release v${process.env.PACKAGE_VERSION}`,
+              draft: true,
+              prerelease: false
+            })
+            return data.id
+
+  build:
+    needs: setup
+
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest]
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7.29.1
+
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "pnpm"
+
+      - name: install rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: setup rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: install dependencies (macos)
+        if: matrix.platform == 'macos-latest'
+        run: rustup target add aarch64-apple-darwin
+
+      - name: install dependencies (ubuntu)
+        if: matrix.platform == 'ubuntu-20.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: install node dependencies
+        run: pnpm i
+
+      - name: set updater endpoint
+        id: set_updater_endpoint
+        run: |
+          if [ "${{ vars.STAGE }}" = "production" ]; then
+            echo "endpoint=https://lander1.ai/releases/updates/{{target}}/{{arch}}/{{current_version}}" >> $GITHUB_OUTPUT
+          else
+            echo "endpoint=https://stg.lander1.ai/releases/updates/{{target}}/{{arch}}/{{current_version}}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: set target
+        id: set_target
+        run: |
+          if [ "${{ matrix.platform }}" = "macos-latest" ]; then
+            echo "target=universal-apple-darwin" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: tauri-apps/tauri-action@dev
+        if: matrix.platform == 'macos-latest'
+        with:
+          releaseId: ${{ needs.setup.outputs.release_id }}
+          args: |
+            --target ${{ steps.set_target.outputs.target }}
+            --config '{"tauri": {"updater": {"endpoints": ["${{ steps.set_updater_endpoint.outputs.endpoint }}"]}}}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_STAGE: ${{ vars.STAGE }}
+          VITE_STRIPE_PK: ${{ secrets.STRIPE_PK }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          ENABLE_CODE_SIGNING: true
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
