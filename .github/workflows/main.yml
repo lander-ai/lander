@@ -57,7 +57,7 @@ jobs:
           if [ "${{ vars.STAGE }}" == "production" ]; then 
             pnpm release
           else 
-            pnpm release --preRelease=alpha
+            pnpm release --preRelease=preview
           fi
 
       - name: Get version
@@ -142,7 +142,7 @@ jobs:
           if [ "${{ vars.STAGE }}" == "production" ]; then
             pnpm release
           else 
-            pnpm release --preRelease=alpha
+            pnpm release --preRelease=preview
           fi
 
       - name: Get version
