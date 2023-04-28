@@ -1,6 +1,7 @@
 import { Component } from "solid-js";
 import { styled } from "solid-styled-components";
 import { Icon, Text } from "~/components/atoms";
+import { SettingsView } from "~/types";
 
 const SWrapper = styled("div")`
   display: grid;
@@ -25,11 +26,6 @@ const SIconWrapper = styled("div")<{ selected: boolean }>`
     background: ${(props) => props.theme?.colors.gray3};
   }
 `;
-
-export enum SettingsView {
-  General,
-  Account,
-}
 
 interface Props {
   view: SettingsView;

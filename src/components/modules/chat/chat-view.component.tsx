@@ -15,6 +15,7 @@ import { InvokeService } from "~/services";
 import { NetworkService } from "~/services/network.service";
 import { commandStore, mouseStore, router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
+import { SettingsView } from "~/types";
 import { chatCommand } from "~/util/ai-commands";
 import { ChatCommand } from "./chat-command.component";
 import { ChatMessage } from "./chat-message.component";
@@ -291,7 +292,9 @@ export const ChatView: Component = () => {
 
           <Link
             mt="4px"
-            onClick={() => InvokeService.shared.openSettingsWindow()}
+            onClick={() =>
+              InvokeService.shared.openSettingsWindow(SettingsView.Account)
+            }
           >
             Upgrade →
           </Link>

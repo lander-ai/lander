@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 import { Application, ApplicationData } from "~/models";
+import { SettingsView } from "~/types";
 import { convertKeysFromSnakeCaseToCamelCase } from "~/util/convert-keys-from-snake-case-to-camel-case";
 
 export class InvokeService {
@@ -25,8 +26,8 @@ export class InvokeService {
     await invoke("hide_panel");
   }
 
-  async openSettingsWindow() {
-    await invoke("open_settings_window");
+  async openSettingsWindow(view?: SettingsView) {
+    await invoke("open_settings_window", { view });
   }
 
   async registerMainWindowHotkey(hotkey: string) {

@@ -1,13 +1,10 @@
 import { createSignal, Match, onMount, Switch } from "solid-js";
 import { styled } from "solid-styled-components";
-import {
-  SettingsGeneral,
-  SettingsHeader,
-  SettingsView,
-} from "~/components/modules";
+import { SettingsGeneral, SettingsHeader } from "~/components/modules";
 import { SettingsAccount } from "~/components/modules/settings/settings-account.component";
 import { InvokeService } from "~/services";
 import { ThemeMode, themeStore } from "~/store";
+import { SettingsView } from "~/types";
 import { cssTheme } from "~/util";
 
 const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
@@ -47,7 +44,19 @@ const STitleBar = styled("div")`
 
 export const SettingsWindow = () => {
   const { themeMode } = themeStore;
-  const [view, setView] = createSignal(SettingsView.Account);
+  const [view, setView] = createSignal(
+    (() => {
+      const searchParams = new URLSearchParams(location.search);
+
+      const view = searchParams.get("view");
+
+      if (view) {
+        return view as SettingsView;
+      }
+
+      return SettingsView.General;
+    })()
+  );
 
   onMount(() => {
     InvokeService.shared.openSettingsWindow();

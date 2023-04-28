@@ -11,7 +11,7 @@ use cocoa::appkit::NSApplicationActivationPolicy;
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 #[tauri::command]
-pub fn open_settings_window(app_handle: AppHandle<Wry>) {
+pub fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
     #[cfg(target_os = "macos")]
     crate::util::set_activation_policy(
         NSApplicationActivationPolicy::NSApplicationActivationPolicyRegular,
@@ -20,10 +20,16 @@ pub fn open_settings_window(app_handle: AppHandle<Wry>) {
     if let Some(settings_window) = app_handle.get_window("settings") {
         settings_window.set_focus().unwrap();
     } else {
+        let mut window_name = String::from("settings.html");
+
+        if let Some(view) = view {
+            window_name.push_str(&format!("?view={}", view));
+        }
+
         let settings_window = tauri::WindowBuilder::new(
             &app_handle,
             "settings",
-            tauri::WindowUrl::App("settings.html".into()),
+            tauri::WindowUrl::App(window_name.into()),
         )
         .visible(false)
         .title("Lander")
