@@ -71,7 +71,9 @@ export const HeaderCommand: Component = () => {
   createEffect(() => {
     const focus = () => {
       if (view() === View.Command) {
-        ref?.focus({ preventScroll: true });
+        setTimeout(() => {
+          ref?.focus({ preventScroll: true });
+        }, 300);
       }
     };
 
