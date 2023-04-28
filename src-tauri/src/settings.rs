@@ -1,18 +1,17 @@
-use std::path::PathBuf;
-
+use std::{cmp, path::PathBuf};
 use tauri::{
     AppHandle, GlobalShortcutManager, Manager, PhysicalPosition, PhysicalSize, Position, Size,
     State, WindowEvent, Wry,
 };
+use tauri_plugin_store::{with_store, StoreCollection};
 
 #[cfg(target_os = "macos")]
 use cocoa::appkit::NSApplicationActivationPolicy;
-use tauri_plugin_store::{with_store, StoreCollection};
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 #[tauri::command]
-pub fn open_settings_window(app_handle: AppHandle<Wry>) {
+pub fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
     #[cfg(target_os = "macos")]
     crate::util::set_activation_policy(
         NSApplicationActivationPolicy::NSApplicationActivationPolicyRegular,
@@ -21,10 +20,16 @@ pub fn open_settings_window(app_handle: AppHandle<Wry>) {
     if let Some(settings_window) = app_handle.get_window("settings") {
         settings_window.set_focus().unwrap();
     } else {
+        let mut window_name = String::from("settings.html");
+
+        if let Some(view) = view {
+            window_name.push_str(&format!("?view={}", view));
+        }
+
         let settings_window = tauri::WindowBuilder::new(
             &app_handle,
             "settings",
-            tauri::WindowUrl::App("settings.html".into()),
+            tauri::WindowUrl::App(window_name.into()),
         )
         .visible(false)
         .title("Lander")
@@ -37,17 +42,20 @@ pub fn open_settings_window(app_handle: AppHandle<Wry>) {
         if let Some(monitor) = settings_window.current_monitor().unwrap() {
             let monitor_size = monitor.size();
 
+            let window_width = cmp::min((monitor_size.width as f64 * 0.8).round() as u32, 2500);
+            let window_height = cmp::min((monitor_size.height as f64 * 0.7).round() as u32, 1400);
+
             settings_window
                 .set_size(Size::Physical(PhysicalSize {
-                    width: (monitor_size.width as f64 * 0.7).round() as u32,
-                    height: (monitor_size.height as f64 * 0.6).round() as u32,
+                    width: window_width,
+                    height: window_height,
                 }))
                 .unwrap();
 
             settings_window
                 .set_position(Position::Physical(PhysicalPosition {
-                    x: (monitor_size.width as f64 * 0.15).round() as i32,
-                    y: (monitor_size.height as f64 * 0.2).round() as i32,
+                    x: ((monitor_size.width / 2) - (window_width / 2)) as i32,
+                    y: ((monitor_size.height / 2) - (window_height / 2)) as i32,
                 }))
                 .unwrap();
         }
