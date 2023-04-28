@@ -99,12 +99,14 @@ export const HeaderCommand: Component = () => {
   return (
     <SSearchInput
       placeholder="Ask me anything"
-      onInput={(e) =>
-        setIsQueryDirty(true) && handleInput(e.currentTarget.value)
-      }
+      onInput={(event) => {
+        handleInput(event.currentTarget.value);
+        setIsQueryDirty(true);
+      }}
       ref={ref}
       readOnly={view() !== View.Command}
       disabled={view() !== View.Command}
+      spellcheck={false}
     />
   );
 };
