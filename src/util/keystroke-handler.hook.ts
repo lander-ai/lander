@@ -28,6 +28,8 @@ export const useKeystrokeHandler = () => {
       if (event.key === "Alt") {
         setIsShortcutsVisible(true);
       } else if (event.key === "Escape") {
+        event.preventDefault();
+
         const v = view();
 
         if (query()) {

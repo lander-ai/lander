@@ -106,6 +106,8 @@ export const SettingsAccountIdentify: Component<Props> = (props) => {
   createEffect(() => {
     const handeKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        event.preventDefault();
+
         handleBack();
       }
     };
