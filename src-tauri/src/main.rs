@@ -49,19 +49,26 @@ fn main() {
                 let updater_app_handler = app.app_handle().clone();
 
                 tauri::async_runtime::spawn(async move {
-                    let builder = tauri::updater::builder(updater_app_handler).target(
-                        if cfg!(target_os = "macos") {
-                            "darwin-universal".to_string()
-                        } else {
-                            tauri::updater::target().unwrap()
-                        },
-                    );
+                    let check_for_updates = async move {
+                        loop {
+                            let builder = tauri::updater::builder(updater_app_handler.clone())
+                                .target(if cfg!(target_os = "macos") {
+                                    "darwin-universal".to_string()
+                                } else {
+                                    tauri::updater::target().unwrap()
+                                });
 
-                    if let Ok(update) = builder.check().await {
-                        if update.is_update_available() {
-                            update.download_and_install().await.unwrap();
+                            if let Ok(update) = builder.check().await {
+                                if update.is_update_available() {
+                                    update.download_and_install().await.unwrap();
+                                }
+                            }
+
+                            tokio::time::sleep(Duration::from_secs(1)).await;
                         }
-                    }
+                    };
+
+                    tokio::spawn(check_for_updates);
                 });
             }
 

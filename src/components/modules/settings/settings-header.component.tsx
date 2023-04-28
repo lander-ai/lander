@@ -9,15 +9,18 @@ const SWrapper = styled("div")`
   gap: 16px;
   justify-content: center;
   align-items: center;
-  height: 60px;
 `;
 
 const SIconWrapper = styled("div")<{ selected: boolean }>`
   display: grid;
+  grid-template-rows: max-content max-content;
   align-items: center;
+  align-content: center;
   justify-items: center;
+  gap: 4px;
   border: 0.5px solid ${(props) => props.theme?.colors.gray4};
-  padding: 12px;
+  height: 60px;
+  width: 90px;
   border-radius: 8px;
   background: ${(props) =>
     props.selected ? props.theme?.colors.gray3 : undefined};
@@ -40,9 +43,7 @@ export const SettingsHeader: Component<Props> = (props) => {
         onClick={() => props.onChange(SettingsView.General)}
       >
         <Icon name="settings" size="22px" />
-        <Text.Caption fontWeight="medium" mt="4px">
-          General
-        </Text.Caption>
+        <Text.Caption fontWeight="medium">General</Text.Caption>
       </SIconWrapper>
 
       <SIconWrapper
@@ -50,9 +51,15 @@ export const SettingsHeader: Component<Props> = (props) => {
         onClick={() => props.onChange(SettingsView.Account)}
       >
         <Icon name="user-2" size="22px" />
-        <Text.Caption fontWeight="medium" mt="4px">
-          Account
-        </Text.Caption>
+        <Text.Caption fontWeight="medium">Account</Text.Caption>
+      </SIconWrapper>
+
+      <SIconWrapper
+        selected={props.view === SettingsView.About}
+        onClick={() => props.onChange(SettingsView.About)}
+      >
+        <Icon name="dna" size="22px" />
+        <Text.Caption fontWeight="medium">About</Text.Caption>
       </SIconWrapper>
     </SWrapper>
   );
