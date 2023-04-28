@@ -1,5 +1,6 @@
+use std::cmp;
 use std::path::PathBuf;
-use tauri::{Manager, PhysicalSize, Size, Theme, Wry};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Position, Size, Theme, Wry};
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_store::{with_store, StoreCollection};
 
@@ -109,16 +110,27 @@ fn main() {
                     if let Some(monitor) = main_window.current_monitor().unwrap() {
                         let monitor_size = monitor.size();
 
-                        // TODO: Add max and min sizes
+                        let window_width =
+                            cmp::min((monitor_size.width as f64 * 0.6).round() as u32, 1800);
+                        let window_height =
+                            cmp::min((monitor_size.height as f64 * 0.5).round() as u32, 1000);
+
                         main_window
                             .set_size(Size::Physical(PhysicalSize {
-                                width: (monitor_size.width as f64 * 0.5).round() as u32,
-                                height: (monitor_size.height as f64 * 0.45).round() as u32,
+                                width: window_width,
+                                height: window_height,
+                            }))
+                            .unwrap();
+
+                        main_window
+                            .set_position(Position::Physical(PhysicalPosition {
+                                x: ((monitor_size.width / 2) - (window_width / 2)) as i32,
+                                y: (((monitor_size.height as f32) * 0.4)
+                                    - ((window_height / 2) as f32))
+                                    as i32,
                             }))
                             .unwrap();
                     }
-
-                    main_window.center().unwrap();
 
                     #[cfg(target_os = "macos")]
                     apply_vibrancy(
