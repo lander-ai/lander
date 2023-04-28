@@ -25,11 +25,13 @@ const SChatInput = styled("div")<{ placeholder: string }>`
   background: transparent;
   border: none;
   outline: none;
-  cursor: text;
   word-break: break-word;
   caret-color: ${(props) => props.theme?.colors.text};
   max-height: 240px;
   overflow-y: scroll;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
 
   &::-webkit-scrollbar {
     display: none;
