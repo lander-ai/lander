@@ -1,6 +1,7 @@
 import { createSignal, Match, onMount, Switch } from "solid-js";
 import { styled } from "solid-styled-components";
 import { SettingsGeneral, SettingsHeader } from "~/components/modules";
+import { SettingsAbout } from "~/components/modules/settings/settings-about.component";
 import { SettingsAccount } from "~/components/modules/settings/settings-account.component";
 import { InvokeService } from "~/services";
 import { ThemeMode, themeStore } from "~/store";
@@ -73,6 +74,9 @@ export const SettingsWindow = () => {
           </Match>
           <Match when={view() === SettingsView.Account}>
             <SettingsAccount />
+          </Match>
+          <Match when={view() === SettingsView.About}>
+            <SettingsAbout />
           </Match>
         </Switch>
       </SContentWrapper>

@@ -13,7 +13,6 @@ import { HTTPError, NetworkService } from "~/services/network.service";
 import { commandStore, mouseStore, queryStore, router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { networkStore } from "~/store/network.store";
-import { checkForUpdates } from "./check-for-updates";
 import { getCommandSection, getCommandSections } from "./command-sections";
 
 const installedApplicationsEvent = new EventService(
@@ -115,16 +114,6 @@ export const useLaunch = () => {
     }
 
     await InvokeService.shared.initPanel();
-
-    setInterval(() => {
-      if (__dev__ || isOffline()) {
-        return;
-      }
-
-      if (document.visibilityState === "hidden") {
-        checkForUpdates();
-      }
-    }, 60 * 1000);
 
     listen("fetch_user_response", () => {
       user.refetch();
