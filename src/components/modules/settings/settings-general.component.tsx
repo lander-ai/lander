@@ -13,9 +13,9 @@ import {
   enable as enableAutostart,
   isEnabled as isAutostartEnabled,
 } from "tauri-plugin-autostart-api";
-import themeDarkModeImage from "~/assets/settings/theme-dark-mode.png";
-import themeLightModeImage from "~/assets/settings/theme-light-mode.png";
-import themeSystemModeImage from "~/assets/settings/theme-system-mode.png";
+import themeDarkModeImage from "~/assets/settings/theme-dark-mode.webp";
+import themeLightModeImage from "~/assets/settings/theme-light-mode.webp";
+import themeSystemModeImage from "~/assets/settings/theme-system-mode.webp";
 import { Button, Checkbox, Hotkey, Text } from "~/components/atoms";
 import { InvokeService, StorageService } from "~/services";
 import { ThemeMode, themeStore } from "~/store";

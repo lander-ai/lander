@@ -66,7 +66,7 @@ export const SettingsAccountProfile: Component<Props> = (props) => {
     (async () => {
       const cardBrand = user.data?.subscription?.card.brand;
       if (cardBrand) {
-        const icon = await import(`../../../assets/cards/${cardBrand}.png`);
+        const icon = await import(`../../../assets/cards/${cardBrand}.webp`);
         setCardIcon(icon.default);
       }
     })();
