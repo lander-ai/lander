@@ -1,5 +1,19 @@
 
 
+## [0.0.1-preview.3](https://github.com/lander-ai/lander/compare/v0.0.1-preview.2...v0.0.1-preview.3) (2023-05-25)
+
+
+### Bug Fixes
+
+* focus command header input ([60ed8e4](https://github.com/lander-ai/lander/commit/60ed8e4f43c2c3086d5b8442234f162696f58dc6))
+* optimize image assets ([f92c529](https://github.com/lander-ai/lander/commit/f92c529dec45bb533df6e5b02d7eb48c22453fd5))
+
+
+### Features
+
+* add about settings panel ([3daa651](https://github.com/lander-ai/lander/commit/3daa6518d1f6f50c794efb1ebbf78b4090ae6970))
+* add plugins ([07f26c5](https://github.com/lander-ai/lander/commit/07f26c54651d0e9df1b2c5abfbf7f8eba21175d3))
+
 ## [0.0.1-preview.2](https://github.com/lander-ai/lander/compare/v0.0.1-preview.1...v0.0.1-preview.2) (2023-04-28)
 
 
