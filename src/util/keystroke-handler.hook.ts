@@ -1,5 +1,6 @@
 import { batch, onMount } from "solid-js";
 import { InvokeService } from "~/services";
+import { NetworkService } from "~/services/network.service";
 import {
   commandStore,
   mouseStore,
@@ -9,6 +10,7 @@ import {
   View,
 } from "~/store";
 import { chatStore } from "~/store/chat.store";
+import { networkStore } from "~/store/network.store";
 
 export const useKeystrokeHandler = () => {
   const { isMouseActive } = mouseStore;
@@ -27,6 +29,7 @@ export const useKeystrokeHandler = () => {
     isPluginsPanelVisible,
     setIsPluginsPanelVisible,
   } = chatStore;
+  const { isStreaming } = networkStore;
 
   onMount(() => {
     const handler = (event: KeyboardEvent) => {
@@ -45,6 +48,8 @@ export const useKeystrokeHandler = () => {
         } else if (v === View.Chat) {
           if (isPluginsPanelVisible()) {
             setIsPluginsPanelVisible(false);
+          } else if (isStreaming()) {
+            NetworkService.subscription?.cancel();
           } else {
             navigate(View.Command);
           }
