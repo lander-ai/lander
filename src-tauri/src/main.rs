@@ -64,6 +64,7 @@ fn main() {
                             if let Ok(update) = builder.check().await {
                                 if update.is_update_available() {
                                     update.download_and_install().await.unwrap();
+                                    updater_app_handler.restart();
                                 }
                             }
 
