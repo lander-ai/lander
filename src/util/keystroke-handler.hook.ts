@@ -21,7 +21,12 @@ export const useKeystrokeHandler = () => {
     searchResults,
   } = commandStore;
   const { setIsShortcutsVisible } = shortcutStore;
-  const { thread, setHighlightedMessage } = chatStore;
+  const {
+    thread,
+    setHighlightedMessage,
+    isPluginsPanelVisible,
+    setIsPluginsPanelVisible,
+  } = chatStore;
 
   onMount(() => {
     const handler = (event: KeyboardEvent) => {
@@ -38,7 +43,11 @@ export const useKeystrokeHandler = () => {
             setQuery("");
           });
         } else if (v === View.Chat) {
-          navigate(View.Command);
+          if (isPluginsPanelVisible()) {
+            setIsPluginsPanelVisible(false);
+          } else {
+            navigate(View.Command);
+          }
         } else {
           setHighlightedCommand(undefined);
           InvokeService.shared.hidePanel();
