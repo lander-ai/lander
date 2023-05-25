@@ -1,10 +1,11 @@
-import { batch, Component, createEffect, onCleanup } from "solid-js";
+import { Component, createEffect, onCleanup, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { Icon } from "~/components/atoms";
-import { Thread, ThreadMessage, ThreadMessageAuthor } from "~/models";
 import { NetworkService } from "~/services/network.service";
 import { router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
+import { networkStore } from "~/store/network.store";
+import { askLander } from "~/util";
 
 const SWrapper = styled("div")`
   display: grid;
@@ -12,10 +13,6 @@ const SWrapper = styled("div")`
   gap: 16px;
   padding: 8px 16px;
   align-items: center;
-
-  &::selection {
-    background: ${(props) => props.theme?.colors.gray};
-  }
 `;
 
 const SChatInput = styled("div")<{ placeholder: string }>`
@@ -29,16 +26,17 @@ const SChatInput = styled("div")<{ placeholder: string }>`
   caret-color: ${(props) => props.theme?.colors.text};
   max-height: 240px;
   overflow-y: scroll;
-  cursor: text;
   user-select: text;
   -webkit-user-select: text;
+  cursor: text;
 
   &::-webkit-scrollbar {
     display: none;
     -webkit-appearance: none;
   }
 
-  &::selection {
+  ::selection,
+  *::selection {
     background: ${(props) => props.theme?.colors.gray};
   }
 
@@ -49,7 +47,7 @@ const SChatInput = styled("div")<{ placeholder: string }>`
   }
 `;
 
-const SSendIcon = styled(Icon)`
+const SButtonIcon = styled(Icon)`
   align-self: end;
   padding: 4px;
   border-radius: 4px;
@@ -63,80 +61,47 @@ const SSendIcon = styled(Icon)`
 
 export const FooterChat: Component = () => {
   const { view } = router;
-  const {
-    thread,
-    setThread,
-    contextualText,
-    setContextualText,
-    setHighlightedMessage,
-  } = chatStore;
+  const { thread, contextualText } = chatStore;
+  const { isStreaming } = networkStore;
 
   let ref: HTMLDivElement | undefined;
 
-  const handleChat = async (input: string) => {
+  const handleSubmit = () => {
+    if (!ref) {
+      return;
+    }
+
     const nextThread = thread();
 
-    if (!ref || !nextThread) {
+    if (!nextThread) {
       return;
     }
 
-    const context = !nextThread?.messages.length
-      ? contextualText()?.text
-      : undefined;
+    const context =
+      nextThread.messages.length === 0 ? contextualText()?.text : undefined;
 
-    const message =
-      context && input ? `${context}\n\n${input}` : context || input;
+    if (!ref.innerText && !context) {
+      return;
+    }
 
-    nextThread.messages.push(
-      new ThreadMessage({
-        id: crypto.randomUUID(),
-        author: ThreadMessageAuthor.User,
-        content: message,
-      })
-    );
+    askLander(ref.innerText, nextThread);
 
-    const request = nextThread.requests.chat;
-
-    const responseMessage = new ThreadMessage({
-      id: crypto.randomUUID(),
-      author: ThreadMessageAuthor.AI,
-      content: "",
-    });
-
-    nextThread.messages.push(responseMessage);
-
-    batch(() => {
-      setHighlightedMessage(undefined);
-      setContextualText((prev) =>
-        prev ? { ...prev, additionalText: input } : undefined
-      );
-      setThread(new Thread(nextThread));
-    });
-
-    const messageIndex = nextThread.messages.findIndex(
-      (m) => m.id === responseMessage.id
-    );
-
-    await NetworkService.shared.stream(request, (content) => {
-      nextThread.messages[messageIndex].content =
-        responseMessage.content + content;
-
-      setThread(new Thread(nextThread));
-    });
+    ref.replaceChildren();
   };
 
-  const handleSubmit = () => {
-    const context =
-      thread()?.messages.length === 0 ? contextualText()?.text : undefined;
+  const handleCancel = () => {
+    NetworkService.subscription?.cancel();
+  };
 
-    if (NetworkService.isStreaming || !ref || (!ref.innerText && !context)) {
-      return;
-    }
-
-    handleChat(ref.innerText);
-
+  const moveCursorToEnd = () => {
     if (ref) {
-      ref.innerText = "";
+      const range = document.createRange();
+      range.selectNodeContents(ref);
+      range.collapse(false);
+
+      const selection = window.getSelection()!;
+      selection.removeAllRanges();
+      selection.addRange(range);
     }
   };
 
@@ -148,9 +113,24 @@ export const FooterChat: Component = () => {
     }
   };
 
-  const handleInput = () => {
-    if (ref && !ref?.innerText.trim()) {
-      ref.innerText = "";
+  const handleInput = (event: InputEvent) => {
+    if (!ref) {
+      return;
+    }
+
+    if (
+      event.inputType.includes("delete") ||
+      event.inputType === "insertParagraph"
+    ) {
+      if (!ref.innerText.trim()) {
+        ref.replaceChildren();
+      }
+    } else if (ref.innerText.length === 1) {
+      const el = document.createElement("div");
+      el.innerText = event.data || "";
+      ref.replaceChildren(el);
+
+      moveCursorToEnd();
     }
   };
 
@@ -165,8 +145,16 @@ export const FooterChat: Component = () => {
       event.preventDefault();
       const content = event.clipboardData?.getData("text/plain");
 
-      if (content) {
-        document.execCommand("insertText", false, content);
+      if (ref && content) {
+        if (!ref.innerText.trim()) {
+          const el = document.createElement("div");
+          el.innerText = content;
+          ref.replaceChildren(el);
+
+          moveCursorToEnd();
+        } else {
+          document.execCommand("insertText", false, content);
+        }
       }
     };
 
@@ -194,7 +182,13 @@ export const FooterChat: Component = () => {
         contentEditable
       />
 
-      <SSendIcon onClick={handleSubmit} name="send-2" size="18px" />
+      <Show when={isStreaming()}>
+        <SButtonIcon onClick={handleCancel} name="cross" size="18px" />
+      </Show>
+
+      <Show when={!isStreaming()}>
+        <SButtonIcon onClick={handleSubmit} name="send-2" size="18px" />
+      </Show>
     </SWrapper>
   );
 };

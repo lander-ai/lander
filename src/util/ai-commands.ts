@@ -5,69 +5,32 @@ import {
   Command,
   CommandType,
   Thread,
-  ThreadMessage,
-  ThreadMessageAuthor,
   ThreadType,
 } from "~/models";
-import { NetworkService } from "~/services/network.service";
 import { commandStore, router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
+import { askLander } from "./ask-lander";
 
-const startChat = async (command: Command, prompt: string) => {
-  const { navigate, view } = router;
-  const { setThread } = chatStore;
+const handleChat = async (command: Command, prompt: string) => {
+  const { navigate } = router;
   const { focusedApplication, setSelectedCommand } = commandStore;
 
   command.application = focusedApplication();
 
   const selectedText = command.application?.selectedText;
 
-  const responseMessage = new ThreadMessage({
-    id: crypto.randomUUID(),
-    author: ThreadMessageAuthor.AI,
-    content: "",
-  });
-
   const thread = new Thread({
     id: crypto.randomUUID(),
     type: ThreadType.Chat,
-    messages: [
-      new ThreadMessage({
-        id: crypto.randomUUID(),
-        author: ThreadMessageAuthor.User,
-        content: `${prompt}${selectedText}`,
-      }),
-    ],
+    messages: [],
   });
 
-  const request = thread.requests.chat;
-
-  thread.messages.push(responseMessage);
-
-  setThread(new Thread(thread));
+  askLander(`${prompt}${selectedText}`, thread);
 
   batch(() => {
     setSelectedCommand(command);
     navigate(View.Chat);
   });
-
-  const messageIndex = thread.messages.findIndex(
-    (message) => message.id === responseMessage.id
-  );
-
-  const subscription = await NetworkService.shared.stream(
-    request,
-    (content) => {
-      if (view() !== View.Chat) {
-        subscription.cancel();
-        return;
-      }
-
-      thread.messages[messageIndex].content = responseMessage.content + content;
-
-      setThread(new Thread(thread));
-    }
-  );
 };
 
 const getCommand = (title: string, prompt: string) => {
@@ -79,7 +42,7 @@ const getCommand = (title: string, prompt: string) => {
     title,
     icon,
     async onClick() {
-      startChat(new Command(this), prompt);
+      handleChat(new Command(this), prompt);
     },
   });
 };
@@ -122,7 +85,7 @@ export const getCustomCommand = (focusedApplication: Application) => {
     subtitle: prompt,
     icon,
     async onClick() {
-      startChat(new Command(this), prompt);
+      handleChat(new Command(this), prompt);
     },
   });
 };

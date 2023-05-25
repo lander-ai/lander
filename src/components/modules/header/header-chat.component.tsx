@@ -1,7 +1,9 @@
-import { Component } from "solid-js";
+import { Component, createEffect, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { Text } from "~/components/atoms";
+import { Button, Text } from "~/components/atoms";
+import { useUser } from "~/queries";
 import { router, View } from "~/store";
+import { chatStore } from "~/store/chat.store";
 
 const SWrapper = styled("div")`
   display: grid;
@@ -25,8 +27,25 @@ const SBackIconWrapper = styled("div")`
   }
 `;
 
+const SRightWrapper = styled("div")``;
+
 export const HeaderChat: Component = () => {
-  const { navigate } = router;
+  const user = useUser();
+
+  const { view, navigate } = router;
+  const { setIsPluginsPanelVisible, selectedPlugins } = chatStore;
+
+  const handleTogglePlugins = () => {
+    if (view() === View.Chat) {
+      setIsPluginsPanelVisible((prev) => !prev);
+    }
+  };
+
+  createEffect(() => {
+    if (view() === View.Command) {
+      setIsPluginsPanelVisible(false);
+    }
+  });
 
   return (
     <SWrapper>
@@ -39,7 +58,23 @@ export const HeaderChat: Component = () => {
           ←
         </Text.Callout>
       </SBackIconWrapper>
-      <Text.Caption color="gray">Press ⌥ for shortcuts</Text.Caption>
+
+      <SRightWrapper>
+        <Show when={user.data?.subscription}>
+          <Button
+            py="2px"
+            onClick={handleTogglePlugins}
+            shortcutIndex={0}
+            selected={!!selectedPlugins().size}
+          >
+            Plugins
+          </Button>
+        </Show>
+
+        <Show when={!user.data?.subscription}>
+          <Text.Caption color="gray">Press ⌥ for shortcuts</Text.Caption>
+        </Show>
+      </SRightWrapper>
     </SWrapper>
   );
 };

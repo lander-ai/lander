@@ -3,6 +3,11 @@ import { Application, ApplicationData } from "~/models";
 import { SettingsView } from "~/types";
 import { convertKeysFromSnakeCaseToCamelCase } from "~/util/convert-keys-from-snake-case-to-camel-case";
 
+export enum BrowserDriver {
+  Chrome = "chrome",
+  Firefox = "firefox",
+}
+
 export class InvokeService {
   static shared = new InvokeService();
 
@@ -95,5 +100,14 @@ export class InvokeService {
 
   async fetchUser() {
     await invoke("fetch_user");
+  }
+
+  async googleSearch(query: string, driverName: BrowserDriver) {
+    const result = await invoke("google_search", {
+      driverName,
+      query,
+    });
+
+    return result as string;
   }
 }

@@ -28,6 +28,9 @@
       },
       "process": {
         "relaunch": true
+      },
+      "shell": {
+        "open": true
       }
     },
     "bundle": {

@@ -235,7 +235,7 @@ export const SettingsAccountProfile: Component<Props> = (props) => {
             onClick={() =>
               prompt({
                 title: "Are you sure you want to delete your account?",
-                body: "Your account and subscription will be terminated immediately. You can create a new account at any time",
+                body: "Your account and subscription will be terminated immediately. You can create a new account at any time.",
                 successText: "Delete account",
                 async onSuccess() {
                   prompt.loading(true);

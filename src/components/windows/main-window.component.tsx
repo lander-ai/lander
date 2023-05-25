@@ -1,7 +1,14 @@
 import { Component } from "solid-js";
 import { styled } from "solid-styled-components";
-import { ChatView, CommandView, Footer, Header } from "~/components/modules";
+import {
+  ChatPluginPanel,
+  ChatView,
+  CommandView,
+  Footer,
+  Header,
+} from "~/components/modules";
 import { router, ThemeMode, themeStore, View } from "~/store";
+import { chatStore } from "~/store/chat.store";
 import { cssTheme, useKeystrokeHandler, useLaunch } from "~/util";
 
 const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
@@ -11,6 +18,7 @@ const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
   border-radius: 12px;
   border: 0.5px solid ${(props) => props.theme?.colors.gray2};
   position: relative;
+  overflow: hidden;
 
   ${(props) =>
     cssTheme(
@@ -32,6 +40,7 @@ const SContentWrapper = styled("div")<{ view: View }>`
 export const MainWindow: Component = () => {
   const { themeMode } = themeStore;
   const { view } = router;
+  const { isPluginsPanelVisible } = chatStore;
 
   useKeystrokeHandler();
 
@@ -45,6 +54,8 @@ export const MainWindow: Component = () => {
         <CommandView />
       </SContentWrapper>
       <Footer />
+
+      <ChatPluginPanel visible={isPluginsPanelVisible()} />
     </SWrapper>
   );
 };

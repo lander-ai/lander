@@ -93,7 +93,7 @@ pub async fn stream(
             }
         }
 
-        window.emit("stream", "[DONE]").unwrap();
+        window.emit("stream", "[END]").unwrap();
     });
 
     return Some(response_json.to_string());

@@ -38,7 +38,7 @@ export const CommandOverviewFocusedApplication: Component<Props> = (props) => {
         src={`${convertFileSrc(props.focusedApplication.icon)}`}
       />
       <div>
-        <Text.Callout fontWeight="600">
+        <Text.Callout fontWeight="medium">
           {props.focusedApplication.name} (selected text)
         </Text.Callout>
         <SSubtitle mt="4px" color="gray">

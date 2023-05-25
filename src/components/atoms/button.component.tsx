@@ -46,6 +46,7 @@ const SWrapper = styled("button")<SWrapperProps>`
 interface Props extends JSX.HTMLAttributes<HTMLButtonElement>, StyledProps {
   children: string;
   onClick: () => void;
+  onShortcut?: () => void;
   shortcutIndex?: number;
   selected?: boolean;
   disabled?: boolean;
@@ -62,6 +63,7 @@ export const Button: Component<Props> = ($props) => {
     "selected",
     "disabled",
     "loading",
+    "onShortcut",
   ]);
 
   return (
@@ -79,7 +81,7 @@ export const Button: Component<Props> = ($props) => {
           <Shortcut
             text={props.children}
             shortcutIndex={props.shortcutIndex as number}
-            onTriggered={props.onClick}
+            onTriggered={props.onShortcut || props.onClick}
           />
         </Show>
       </Text.Callout>

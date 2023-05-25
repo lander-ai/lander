@@ -12,7 +12,11 @@ import {
 
 type StyledProps = SpaceProps & TypographyProps & ColorProps & LayoutProps;
 
-const Base = styled.div<StyledProps>`
+interface BaseProps extends StyledProps {
+  content?: string;
+}
+
+const Base = styled.div<BaseProps>`
   font-weight: ${(props) => props.theme?.fontWeights.regular};
   color: ${(props) => props.theme?.colors.text};
   text-decoration-color: ${(props) => props.theme?.colors.text};
@@ -21,6 +25,19 @@ const Base = styled.div<StyledProps>`
   ${typography};
   ${color};
   ${layout};
+
+  &::selection {
+    background: ${(props) => props.theme?.colors.gray};
+  }
+
+  ${(props) =>
+    props.content
+      ? `
+          &::before {
+            content: attr(content);
+          }
+        `
+      : undefined}
 `;
 
 const SuperLargeTitle = styled(Base)<StyledProps>`

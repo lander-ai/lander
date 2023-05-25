@@ -119,6 +119,9 @@ export const SettingsAccountDefault: Component<Props> = (props) => {
           <Text.Body mt="8px" color="gray">
             ✓ Access to latest AI models
           </Text.Body>
+          <Text.Body mt="8px" color="gray">
+            ✓ Plugins (up to 50 messages a day)
+          </Text.Body>
         </div>
 
         <div>
