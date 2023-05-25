@@ -1,8 +1,9 @@
-use std::cmp;
 use std::path::PathBuf;
+use std::{cmp, fs};
 use tauri::{Manager, PhysicalPosition, PhysicalSize, Position, Size, Theme, Wry};
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_store::{with_store, StoreCollection};
+use webdriver_install::Driver;
 
 #[cfg(target_os = "windows")]
 use window_vibrancy::apply_blur;
@@ -11,6 +12,7 @@ use window_vibrancy::apply_blur;
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 mod command;
+mod cortex;
 mod panel;
 mod settings;
 mod stream;
@@ -42,6 +44,7 @@ fn main() {
             command::get_text_from_clipboard,
             command::insert_text,
             command::replace_text,
+            cortex::google_search
         ])
         .setup(move |app| {
             #[cfg(not(debug_assertions))]
@@ -64,7 +67,7 @@ fn main() {
                                 }
                             }
 
-                            tokio::time::sleep(Duration::from_secs(1)).await;
+                            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
                         }
                     };
 
@@ -158,6 +161,18 @@ fn main() {
                             .emit("get_installed_applications_response", payload)
                             .unwrap();
                     });
+
+                    let app_cache_dir = app.path_resolver().app_cache_dir().unwrap();
+                    let webdriver_dir = app_cache_dir.join("webdrivers");
+                    fs::create_dir_all(&webdriver_dir).unwrap();
+
+                    if !webdriver_dir.join("chromedriver").exists() {
+                        Driver::Chrome.install_into(webdriver_dir.clone()).unwrap();
+                    }
+
+                    if !webdriver_dir.join("geckodriver").exists() {
+                        Driver::Gecko.install_into(webdriver_dir.clone()).unwrap();
+                    }
 
                     Ok(())
                 },

@@ -7,5 +7,6 @@ export * from "./loading-indicator.component";
 export * from "./prompt.component";
 export * from "./shortcut.component";
 export * from "./syntax-highlight.component";
+export * from "./tag.component";
 export * from "./text.component";
 export * from "./tooltip.component";

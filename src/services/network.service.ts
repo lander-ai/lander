@@ -1,6 +1,7 @@
 import { listen } from "@tauri-apps/api/event";
 import { Body, fetch, Response } from "@tauri-apps/api/http";
 import { __api_endpoint__ } from "~/constants";
+import { networkStore } from "~/store/network.store";
 import { convertKeysFromSnakeCaseToCamelCase } from "~/util";
 import { InvokeService } from "./invoke.service";
 
@@ -54,7 +55,27 @@ export type ListenerCallback = (response: ListenerResponse) => void;
 export class NetworkService {
   static shared = new NetworkService();
 
-  static isStreaming = false;
+  private static _isStreaming = false;
+
+  static get isStreaming() {
+    return this._isStreaming;
+  }
+
+  static set isStreaming(value: boolean) {
+    const { setIsStreaming } = networkStore;
+    setIsStreaming(value);
+
+    if (!value) {
+      this.subscription = undefined;
+    }
+
+    this._isStreaming = value;
+  }
+
+  static subscription?: {
+    response: unknown;
+    cancel: () => void;
+  };
 
   listeners: Array<{ id: string; type: "stream"; callback: ListenerCallback }> =
     [];
@@ -119,7 +140,8 @@ export class NetworkService {
 
   async stream(
     networkURL: NetworkRequest,
-    callback: (response: string) => void
+    callback: (response: string) => void,
+    end?: () => void
   ) {
     NetworkService.isStreaming = true;
 
@@ -128,15 +150,14 @@ export class NetworkService {
     const unsubscribe = await listen("stream", (event) => {
       const data = event.payload as string;
 
-      if (data === "[DONE]") {
+      if (data === "[END]") {
         unsubscribe();
         NetworkService.isStreaming = false;
+        end?.();
         return;
       }
 
-      data.split("data: ").forEach((chunk) => {
-        callback(chunk.replace(/\n\n$/, ""));
-      });
+      callback(data.replace(/^data: /, "").replace(/\n\n$/, ""));
 
       if (data === "[LANDER_STREAM_ERROR]") {
         unsubscribe();
@@ -167,7 +188,7 @@ export class NetworkService {
       }
     });
 
-    return {
+    NetworkService.subscription = {
       response: JSON.parse(response),
       cancel: () => {
         unsubscribe();
@@ -175,6 +196,8 @@ export class NetworkService {
         InvokeService.shared.cancelStream();
       },
     };
+
+    return NetworkService.subscription!;
   }
 
   addListener(type: "stream", callback: ListenerCallback) {

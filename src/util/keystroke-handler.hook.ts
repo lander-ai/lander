@@ -44,8 +44,6 @@ export const useKeystrokeHandler = () => {
           InvokeService.shared.hidePanel();
         }
       } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-        event.preventDefault();
-
         const movement = event.key === "ArrowDown" ? 1 : -1;
         const up = movement === -1;
         const down = !up;
@@ -80,6 +78,8 @@ export const useKeystrokeHandler = () => {
         }
 
         if (view() === View.Command) {
+          event.preventDefault();
+
           setHighlightedCommand((prev) => {
             const commands = query()
               ? searchResults()

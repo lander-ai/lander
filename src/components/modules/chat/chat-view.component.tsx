@@ -16,6 +16,7 @@ import { NetworkService } from "~/services/network.service";
 import { commandStore, mouseStore, router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { SettingsView } from "~/types";
+import { retryLander } from "~/util";
 import { chatCommand } from "~/util/ai-commands";
 import { ChatCommand } from "./chat-command.component";
 import { ChatMessage } from "./chat-message.component";
@@ -50,6 +51,10 @@ export const ChatView: Component = () => {
     chatCount,
     chatLimit,
     chatCountTTL,
+    chatPluginCount,
+    chatPluginLimit,
+    chatPluginCountTTL,
+    selectedPlugins,
   } = chatStore;
 
   const [isAutoScroll, setIsAutoScroll] = createSignal(true);
@@ -108,28 +113,7 @@ export const ChatView: Component = () => {
 
     await new Promise((r) => setTimeout(r, 300));
 
-    const request = nextThread.requests.chat;
-
-    const responseMessage = new ThreadMessage({
-      id: crypto.randomUUID(),
-      author: ThreadMessageAuthor.AI,
-      content: "",
-    });
-
-    nextThread.messages.push(responseMessage);
-
-    setThread(new Thread(nextThread));
-
-    const messageIndex = nextThread.messages.findIndex(
-      (m) => m.id === responseMessage.id
-    );
-
-    await NetworkService.shared.stream(request, (content) => {
-      nextThread.messages[messageIndex].content =
-        responseMessage.content + content;
-
-      setThread(new Thread(nextThread));
-    });
+    retryLander(nextThread);
   };
 
   createEffect(() => {
@@ -230,12 +214,16 @@ export const ChatView: Component = () => {
   });
 
   const chatCountText = createMemo(() => {
-    const ttl = chatCountTTL();
-    const limit = chatLimit();
-    const count = chatCount();
+    const ttl = !user.data?.subscription
+      ? chatCountTTL()
+      : chatPluginCountTTL();
+    const limit = !user.data?.subscription ? chatLimit() : chatPluginLimit();
+    const count = !user.data?.subscription ? chatCount() : chatPluginCount();
 
     if (Number.isNaN(limit) || Number.isNaN(count)) {
-      return "You have 25 messages remaining today";
+      return `You have ${
+        user.data?.subscription ? 50 : 25
+      } messages remaining today`;
     }
 
     if (ttl < Date.now() / 1000) {
@@ -269,6 +257,7 @@ export const ChatView: Component = () => {
 
   createEffect(() => {
     if (view() === View.Command) {
+      NetworkService.subscription?.cancel();
       setContextualText(undefined);
     }
   });
@@ -278,8 +267,12 @@ export const ChatView: Component = () => {
       ref={wrapperRef}
       onMouseLeave={() => setHighlightedMessage(undefined)}
     >
-      <Show when={!user.data?.subscription}>
+      <Show when={!user.data?.subscription || selectedPlugins().size}>
         <SLimitWrapper>
+          <Show when={user.data?.subscription}>
+            <Text.Callout fontWeight="medium">Plugins</Text.Callout>
+          </Show>
+
           <Text.Callout color="gray">{chatCountText()}</Text.Callout>
 
           <Show when={chatCountUsageResetText()} keyed>
@@ -290,14 +283,16 @@ export const ChatView: Component = () => {
             )}
           </Show>
 
-          <Link
-            mt="4px"
-            onClick={() =>
-              InvokeService.shared.openSettingsWindow(SettingsView.Account)
-            }
-          >
-            Upgrade →
-          </Link>
+          <Show when={!user.data?.subscription}>
+            <Link
+              mt="4px"
+              onClick={() =>
+                InvokeService.shared.openSettingsWindow(SettingsView.Account)
+              }
+            >
+              Upgrade →
+            </Link>
+          </Show>
         </SLimitWrapper>
       </Show>
 

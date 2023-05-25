@@ -1,4 +1,5 @@
 import { createRoot, createSignal } from "solid-js";
+import { Plugins } from "~/cortex";
 import { Thread, ThreadMessage } from "~/models";
 
 export interface ContextualText {
@@ -21,6 +22,17 @@ export const chatStore = createRoot(() => {
   const [chatLimit, setChatLimit] = createSignal(
     Number(localStorage.getItem("chat_limit") || 25)
   );
+  const [chatPluginCount, setChatPluginCount] = createSignal(
+    Number(localStorage.getItem("chat_plugin_count") || 0)
+  );
+  const [chatPluginCountTTL, setChatPluginCountTTL] = createSignal(
+    Number(localStorage.getItem("chat_plugin_count_ttl") || 0)
+  );
+  const [chatPluginLimit, setChatPluginLimit] = createSignal(
+    Number(localStorage.getItem("chat_plugin_limit") || 50)
+  );
+  const [isPluginsPanelVisible, setIsPluginsPanelVisible] = createSignal(false);
+  const [selectedPlugins, setSelectedPlugins] = createSignal(new Plugins());
 
   return {
     thread,
@@ -35,5 +47,15 @@ export const chatStore = createRoot(() => {
     setChatCountTTL,
     chatLimit,
     setChatLimit,
+    chatPluginCount,
+    setChatPluginCount,
+    chatPluginCountTTL,
+    setChatPluginCountTTL,
+    chatPluginLimit,
+    setChatPluginLimit,
+    isPluginsPanelVisible,
+    setIsPluginsPanelVisible,
+    selectedPlugins,
+    setSelectedPlugins,
   };
 });

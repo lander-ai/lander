@@ -10,8 +10,12 @@ type StyledProps = SpaceProps;
 const SPre = styled("pre")<StyledProps>`
   padding: 0;
   margin: 0;
-  user-select: text;
-  -webkit-user-select: text;
+
+  * {
+    user-select: text;
+    -webkit-user-select: text;
+    cursor: text;
+  }
 
   ${space};
 `;

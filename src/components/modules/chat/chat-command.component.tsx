@@ -183,7 +183,6 @@ export const ChatCommand: Component<Props> = (props) => {
                     {layout.title}
                   </Text.Callout>
                   <Show when={layout.text}>
-                    {" "}
                     <SChevron
                       name="chevron-small-down"
                       size="24px"

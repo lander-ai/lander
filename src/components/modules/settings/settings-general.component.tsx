@@ -1,6 +1,7 @@
 import { relaunch } from "@tauri-apps/api/process";
 import {
   Component,
+  createEffect,
   createResource,
   createSignal,
   onMount,
@@ -13,9 +14,9 @@ import {
   enable as enableAutostart,
   isEnabled as isAutostartEnabled,
 } from "tauri-plugin-autostart-api";
-import themeDarkModeImage from "~/assets/settings/theme-dark-mode.png";
-import themeLightModeImage from "~/assets/settings/theme-light-mode.png";
-import themeSystemModeImage from "~/assets/settings/theme-system-mode.png";
+import themeDarkModeImage from "~/assets/settings/theme-dark-mode.webp";
+import themeLightModeImage from "~/assets/settings/theme-light-mode.webp";
+import themeSystemModeImage from "~/assets/settings/theme-system-mode.webp";
 import { Button, Checkbox, Hotkey, Text } from "~/components/atoms";
 import { InvokeService, StorageService } from "~/services";
 import { ThemeMode, themeStore } from "~/store";
@@ -62,21 +63,26 @@ export const SettingsGeneral: Component = () => {
   const { themeMode: prevThemeMode } = themeStore;
 
   const [themeMode, setThemeMode] = createSignal<ThemeMode>();
+  const [autostartRef, setAutostartRef] = createSignal<HTMLInputElement>();
 
   const [mainWindowHotkey] = createResource(
     () => StorageService.shared.get("main_window_hotkey") as Promise<string>
   );
 
-  let autostartRef: HTMLInputElement | undefined;
-
   onMount(async () => {
-    if (autostartRef) {
-      autostartRef.checked = await isAutostartEnabled();
-    }
-
     const theme = (await StorageService.shared.get("theme")) as ThemeMode;
 
     setThemeMode(theme || ThemeMode.System);
+  });
+
+  createEffect(() => {
+    (async () => {
+      const ref = autostartRef();
+
+      if (ref) {
+        ref.checked = await isAutostartEnabled();
+      }
+    })();
   });
 
   const handleToggleAutostart = (value: boolean) => {
@@ -116,11 +122,10 @@ export const SettingsGeneral: Component = () => {
 
         <SRow gridGap="16px">
           <Checkbox
-            ref={autostartRef}
+            ref={setAutostartRef}
             onChange={(event) => {
               handleToggleAutostart(event.currentTarget.checked);
             }}
-            type="checkbox"
           />
           <Text.Callout fontWeight="medium" color="gray">
             Launch Lander at login

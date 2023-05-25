@@ -10,6 +10,7 @@ export interface MessageSection {
   code?: {
     language?: string;
   };
+  tools?: string[];
 }
 
 export const parseMessage = (message: string): MessageSection[] => {

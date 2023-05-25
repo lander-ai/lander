@@ -5,16 +5,17 @@ import { Text } from "./text.component";
 
 type StyledProps = SpaceProps & TypographyProps & ColorProps;
 
-const SWrapper = styled(Text.Callout)`
+const SWrapper = styled(Text.Callout)<{ underline?: boolean }>`
   width: max-content;
+  text-underline-offset: 4px;
+  ${(props) => (props.underline ? `text-decoration: underline;` : undefined)}
 
   &:hover {
     opacity: 0.7;
   }
 
   &:active {
-    opacity: 1;
-    color: ${(props) => props.theme?.colors.gray};
+    opacity: 0.5;
   }
 `;
 
@@ -22,10 +23,15 @@ interface Props
   extends JSX.HTMLAttributes<HTMLDivElement>,
     Omit<StyledProps, "color"> {
   children: JSX.Element;
+  underline?: boolean;
 }
 
 export const Link: Component<Props> = ($props) => {
   const [props, rest] = splitProps($props, ["children"]);
 
-  return <SWrapper {...rest}>{props.children}</SWrapper>;
+  return (
+    <SWrapper underline {...rest}>
+      {props.children}
+    </SWrapper>
+  );
 };

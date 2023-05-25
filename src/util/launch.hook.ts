@@ -35,7 +35,14 @@ export const useLaunch = () => {
   } = commandStore;
   const { queryRef } = queryStore;
   const { view } = router;
-  const { setChatCount, setChatCountTTL, setChatLimit } = chatStore;
+  const {
+    setChatCount,
+    setChatCountTTL,
+    setChatLimit,
+    setChatPluginCount,
+    setChatPluginCountTTL,
+    setChatPluginLimit,
+  } = chatStore;
   const { isOffline, setIsOffline } = networkStore;
 
   const user = useUser({ enabled: false });
@@ -84,6 +91,9 @@ export const useLaunch = () => {
         chat_count: chatCount,
         chat_count_ttl: chatCountTTL,
         chat_limit: chatLimit,
+        chat_plugin_count: chatPluginCount,
+        chat_plugin_count_ttl: chatPluginCountTTL,
+        chat_plugin_limit: chatPluginLimit,
       } = response.headers;
 
       if (
@@ -98,6 +108,20 @@ export const useLaunch = () => {
         setChatCount(parseInt(chatCount));
         setChatCountTTL(parseInt(chatCountTTL));
         setChatLimit(parseInt(chatLimit));
+      }
+
+      if (
+        chatPluginCount !== undefined &&
+        chatPluginCountTTL !== undefined &&
+        chatPluginLimit !== undefined
+      ) {
+        localStorage.setItem("chat_plugin_count", chatPluginCount);
+        localStorage.setItem("chat_plugin_count_ttl", chatPluginCountTTL);
+        localStorage.setItem("chat_plugin_count_limit", chatPluginLimit);
+
+        setChatPluginCount(parseInt(chatPluginCount));
+        setChatPluginCountTTL(parseInt(chatPluginCountTTL));
+        setChatPluginLimit(parseInt(chatPluginLimit));
       }
     });
 
