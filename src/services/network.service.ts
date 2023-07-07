@@ -157,12 +157,7 @@ export class NetworkService {
         return;
       }
 
-      callback(
-        data
-          .trimStart()
-          .replace(/^data: /, "")
-          .replace(/\n\n$/, "")
-      );
+      callback(data.split(/data: (.*)\n\n/).join(""));
 
       if (data === "[LANDER_STREAM_ERROR]") {
         unsubscribe();
