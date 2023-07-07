@@ -1,6 +1,5 @@
 import { listen } from "@tauri-apps/api/event";
-import { batch, createEffect, onMount } from "solid-js";
-import { __dev__ } from "~/constants";
+import { batch, onMount } from "solid-js";
 import { CommandType, User } from "~/models";
 import { useUser } from "~/queries";
 import {
@@ -43,7 +42,7 @@ export const useLaunch = () => {
     setChatPluginCountTTL,
     setChatPluginLimit,
   } = chatStore;
-  const { isOffline, setIsOffline } = networkStore;
+  const { setIsOffline } = networkStore;
 
   const user = useUser({ enabled: false });
 
@@ -172,11 +171,12 @@ export const useLaunch = () => {
 
       batch(async () => {
         setHighlightedCommand(undefined);
+        setFocusedApplication(focusedApplication);
+        setIsOffline(!(await authenticate()));
         setCommandSection(
           CommandType.AI,
           await getCommandSection(CommandType.AI, { focusedApplication })
         );
-        setFocusedApplication(focusedApplication);
       });
     });
 
@@ -187,15 +187,5 @@ export const useLaunch = () => {
     window.addEventListener("offline", () => {
       setIsOffline(true);
     });
-  });
-
-  createEffect(() => {
-    if (isOffline()) {
-      setTimeout(async () => {
-        if (navigator.onLine) {
-          setIsOffline(!(await authenticate()));
-        }
-      }, 60 * 1000);
-    }
   });
 };
