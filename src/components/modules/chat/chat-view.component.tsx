@@ -260,6 +260,10 @@ export const ChatView: Component = () => {
       NetworkService.subscription?.cancel();
       setContextualText(undefined);
     }
+
+    if (view() === View.Chat) {
+      user.refetch();
+    }
   });
 
   return (

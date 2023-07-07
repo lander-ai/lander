@@ -64,10 +64,11 @@ fn main() {
                             if let Ok(update) = builder.check().await {
                                 if update.is_update_available() {
                                     update.download_and_install().await.unwrap();
+                                    updater_app_handler.restart();
                                 }
                             }
 
-                            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                            tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
                         }
                     };
 
