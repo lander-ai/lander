@@ -199,25 +199,23 @@ pub async fn set_focused_application(app_handle: tauri::AppHandle) {
         .spawn()
         .unwrap();
 
-    let mut focused_application: Option<Application> = None;
-
     while let Some(event) = rx.recv().await {
         if let CommandEvent::Stdout(data) = event {
             if let Ok(windows_application) = serde_json::from_str::<WindowsApplication>(&data) {
-                focused_application = Some(get_application_from_windows_application(
+                let focused_application = Some(get_application_from_windows_application(
                     app_handle.clone(),
                     windows_application,
                 ));
+
+                app_handle
+                    .state::<State>()
+                    .0
+                    .lock()
+                    .unwrap()
+                    .focused_application = focused_application;
             }
         }
     }
-
-    app_handle
-        .state::<State>()
-        .0
-        .lock()
-        .unwrap()
-        .focused_application = focused_application;
 }
 
 pub fn get_focused_application(app_handle: tauri::AppHandle) -> Option<Application> {

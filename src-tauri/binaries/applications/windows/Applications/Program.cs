@@ -114,8 +114,6 @@ namespace Applications {
         }
 
         static FocusedApplication? GetFocusedApplication() {
-            System.Threading.Thread.Sleep(1000);
-
             FocusedApplication? focusedApplication = null;
 
             var foregroundWindow = GetForegroundWindow();

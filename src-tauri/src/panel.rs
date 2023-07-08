@@ -23,12 +23,8 @@ pub fn init_panel(app_handle: AppHandle<Wry>, window: Window<Wry>) {
 }
 
 #[tauri::command]
-pub async fn show_panel(app_handle: AppHandle<Wry>) {
-    #[cfg(target_os = "macos")]
+pub fn show_panel(app_handle: AppHandle<Wry>) {
     panel::show_panel(app_handle);
-
-    #[cfg(target_os = "windows")]
-    panel::show_panel(app_handle).await;
 }
 
 #[tauri::command]
@@ -37,10 +33,6 @@ pub fn hide_panel(app_handle: AppHandle<Wry>) {
 }
 
 #[tauri::command]
-pub async fn toggle_panel(app_handle: AppHandle<Wry>) {
-    #[cfg(target_os = "macos")]
+pub fn toggle_panel(app_handle: AppHandle<Wry>) {
     panel::toggle_panel(app_handle);
-
-    #[cfg(target_os = "windows")]
-    panel::toggle_panel(app_handle).await;
 }

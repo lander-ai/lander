@@ -49,12 +49,12 @@ fn main() {
         .setup(move |app| {
             #[cfg(not(debug_assertions))]
             {
-                let updater_app_handler = app.app_handle().clone();
+                let updater_app_handle = app.app_handle().clone();
 
                 tauri::async_runtime::spawn(async move {
                     let check_for_updates = async move {
                         loop {
-                            let builder = tauri::updater::builder(updater_app_handler.clone())
+                            let builder = tauri::updater::builder(updater_app_handle.clone())
                                 .target(if cfg!(target_os = "macos") {
                                     "darwin-universal".to_string()
                                 } else {
@@ -64,7 +64,7 @@ fn main() {
                             if let Ok(update) = builder.check().await {
                                 if update.is_update_available() {
                                     update.download_and_install().await.unwrap();
-                                    updater_app_handler.restart();
+                                    updater_app_handle.restart();
                                 }
                             }
 
@@ -159,6 +159,36 @@ fn main() {
                             if matches!(event, WindowEvent::Focused(false)) {
                                 panel::hide_panel(window_blur_app_handle.clone());
                             }
+                        });
+                    }
+
+                    #[cfg(target_os = "windows")]
+                    {
+                        let focused_application_app_handle = app.app_handle().clone();
+                        let focused_application_main_window = main_window.clone();
+
+                        tauri::async_runtime::spawn(async move {
+                            let set_focused_window = async move {
+                                loop {
+                                    if let Ok(is_window_visible) =
+                                        focused_application_main_window.is_visible()
+                                    {
+                                        if !is_window_visible {
+                                            command::application::windows::set_focused_application(
+                                                focused_application_app_handle.clone(),
+                                            )
+                                            .await;
+                                        } else {
+                                            tokio::time::sleep(tokio::time::Duration::from_millis(
+                                                100,
+                                            ))
+                                            .await;
+                                        }
+                                    }
+                                }
+                            };
+
+                            tokio::spawn(set_focused_window);
                         });
                     }
 

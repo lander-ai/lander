@@ -126,15 +126,7 @@ pub fn register_main_window_hotkey(
             app_handle
                 .global_shortcut_manager()
                 .register(&hotkey, move || {
-                    let app_handle = app_handle.clone();
-
-                    #[cfg(target_os = "macos")]
-                    crate::panel::toggle_panel(app_handle);
-
-                    #[cfg(target_os = "windows")]
-                    tauri::async_runtime::spawn(async move {
-                        crate::panel::toggle_panel(app_handle).await;
-                    });
+                    crate::panel::toggle_panel(app_handle.clone());
                 })
                 .unwrap_or_default();
 
