@@ -2,12 +2,21 @@ import {
   Component,
   createEffect,
   createSignal,
+  For,
+  Match,
   onCleanup,
   Show,
+  Switch,
 } from "solid-js";
 import { styled } from "solid-styled-components";
+import { __macos__, __windows__ } from "~/constants";
 import { Icon } from "./icon.component";
+import { Link } from "./link.component";
 import { Text } from "./text.component";
+
+let isSetsEqual = (a: Set<unknown>, b: Set<unknown>) => {
+  return a.size === b.size && [...a].every((value) => b.has(value));
+};
 
 const SWrapper = styled("div")`
   display: grid;
@@ -18,18 +27,31 @@ const SWrapper = styled("div")`
 `;
 
 const SListenerWrapper = styled("div")`
-  padding: 0 12px;
+  padding: 0 8px;
   height: 36px;
   display: grid;
   align-items: center;
-  width: 100px;
-  background: ${(props) => props.theme?.colors.gray4};
-  border: ${(props) => `0.5px solid ${props.theme?.colors.gray2}`};
+  min-width: 100px;
+  background: ${(props) => props.theme?.colors.gray5};
+  border: ${(props) => `0.5px solid ${props.theme?.colors.gray3}`};
   border-radius: 4px;
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: start;
+  gap: 8px;
 
   &:hover {
-    background: ${(props) => props.theme?.colors.gray3};
+    border: ${(props) => `0.5px solid ${props.theme?.colors.gray2}`};
   }
+`;
+
+const SKey = styled(Text.Caption)`
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid ${(props) => props.theme?.colors.gray3};
+  background: ${(props) => props.theme?.colors.gray3};
+  text-transform: uppercase;
+  font-size: 10px;
 `;
 
 const SCloseIconWrapper = styled("div")`
@@ -48,6 +70,7 @@ const SCloseIconWrapper = styled("div")`
 
 interface Props {
   onChange: (hotkey: string[]) => void;
+  recommendedHotkey?: string[];
   defaultValue?: string;
 }
 
@@ -84,6 +107,10 @@ export const Hotkey: Component<Props> = (props) => {
         event.code === "Space" ||
         event.code === "Enter"
       ) {
+        if (recording().size < 1) {
+          return;
+        }
+
         const next = setRecording((s) => {
           s.add(
             event.code.includes("Key")
@@ -126,61 +153,45 @@ export const Hotkey: Component<Props> = (props) => {
     });
   });
 
-  const getHotkeyText = (keys: Set<string>) => {
-    keys = new Set(keys);
-
-    const value = [];
-
-    if (keys.has("Super")) {
-      value.push("⌘");
-      keys.delete("Super");
+  const handleSetRecommendedHotkey = () => {
+    if (!props.recommendedHotkey) {
+      return;
     }
 
-    if (keys.has("Control")) {
-      value.push("⌃");
-      keys.delete("Control");
-    }
-
-    if (keys.has("Alt")) {
-      value.push("⌥");
-      keys.delete("Alt");
-    }
-
-    if (keys.has("Shift")) {
-      value.push("⇧");
-      keys.delete("Shift");
-    }
-
-    Array.from(keys).forEach((key) => {
-      if (key === "Enter") {
-        value.push("⏎");
-      } else if (key === "Space") {
-        value.push("⎵");
-      } else {
-        value.push(key);
-      }
-    });
-
-    return value.join("");
+    setHotkey(new Set(props.recommendedHotkey));
+    props.onChange(props.recommendedHotkey);
   };
 
   return (
     <SWrapper>
       <SListenerWrapper onClick={() => setIsListening((s) => !s)}>
-        <Text.Callout
-          letterSpacing={
-            (isListening() && recording().size) ||
-            (!isListening() && hotkey().size)
-              ? "4px"
-              : undefined
-          }
-          fontWeight="medium"
-        >
-          {isListening()
-            ? getHotkeyText(recording()) || "Recording"
-            : getHotkeyText(hotkey()) || "Record"}
-        </Text.Callout>
+        <Switch>
+          <Match when={isListening() && recording().size}>
+            <For each={Array.from(recording())}>
+              {(key) => <SKey>{key}</SKey>}
+            </For>
+          </Match>
+          <Match when={isListening()}>
+            <Text.Callout fontWeight="medium">Recording</Text.Callout>
+          </Match>
+          <Match when={!isListening() && hotkey().size}>
+            <For each={Array.from(hotkey())}>{(key) => <SKey>{key}</SKey>}</For>
+          </Match>
+          <Match when>
+            <Text.Callout fontWeight="medium">Record</Text.Callout>
+          </Match>
+        </Switch>
       </SListenerWrapper>
+
+      <Show
+        when={
+          props.recommendedHotkey &&
+          !isSetsEqual(hotkey(), new Set(props.recommendedHotkey)) &&
+          !isListening()
+        }
+      >
+        <Link onClick={handleSetRecommendedHotkey}>Use recommended hotkey</Link>
+      </Show>
 
       <Show when={isListening()}>
         <SCloseIconWrapper onClick={() => setIsListening(false)}>

@@ -1,5 +1,5 @@
 export const theme = {
-  fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`,
+  fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`,
   colors: {
     text: "#000000",
     background: "#ffffff",
@@ -27,7 +27,6 @@ export const theme = {
     },
   },
   fontWeights: {
-    light: "400",
     regular: "500",
     medium: "600",
     semibold: "700",

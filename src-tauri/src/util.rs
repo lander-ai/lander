@@ -1,18 +1,15 @@
-use cocoa::appkit::{NSApplication, NSApplicationActivationPolicy};
-use cocoa::base::{nil, NO};
-use objc::{msg_send, sel, sel_impl};
+#[cfg(target_os = "macos")]
+pub use macos as util;
+
+#[cfg(target_os = "macos")]
+use cocoa::appkit::NSApplicationActivationPolicy;
 
 #[cfg(target_os = "macos")]
 pub fn set_activation_policy(policy: NSApplicationActivationPolicy) {
-    let app = unsafe { NSApplication::sharedApplication(nil) };
+    util.set_activation_policy(policy)
+}
 
-    let success: bool = unsafe {
-        let _: () = msg_send![app, setActivationPolicy: policy];
-        app.activateIgnoringOtherApps_(NO);
-        true
-    };
-
-    if !success {
-        eprintln!("Failed to set activation policy");
-    }
+#[tauri::command]
+pub fn print(data: String) {
+    println!("{data}");
 }

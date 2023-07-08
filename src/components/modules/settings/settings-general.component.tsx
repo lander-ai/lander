@@ -141,6 +141,7 @@ export const SettingsGeneral: Component = () => {
             <Hotkey
               onChange={handleRegisterHotkey}
               defaultValue={mainWindowHotkey()}
+              recommendedHotkey={["Alt", "Space"]}
             />
             <Text.Callout mt="8px" color="gray">
               Set hotkey to launch Lander

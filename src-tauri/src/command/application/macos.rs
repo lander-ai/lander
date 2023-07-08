@@ -30,6 +30,9 @@ use std::{fs, path::Path, path::PathBuf};
 
 use crate::command::application::Application;
 
+#[derive(Default)]
+pub struct State(pub Mutex<None>);
+
 fn search_for_applications(path: &Path) -> Vec<PathBuf> {
     use regex::Regex;
 
@@ -192,7 +195,7 @@ fn store_icons(app_handle: tauri::AppHandle) {
     }
 }
 
-pub fn get_installed_applications() -> Vec<Application> {
+pub fn get_installed_applications(_app_handle: tauri::AppHandle) -> Vec<Application> {
     let application_paths = get_application_paths();
 
     let mut applications: Vec<Application> = application_paths
@@ -206,7 +209,7 @@ pub fn get_installed_applications() -> Vec<Application> {
     applications
 }
 
-pub fn launch_application(id: &str) {
+pub fn launch_application(id: &str, _app_handle: tauri::AppHandle) {
     Command::new("open")
         .arg("-b")
         .arg(id)
@@ -358,7 +361,7 @@ fn get_focused_element_text_value_from_ns_application(
     return Some(text);
 }
 
-pub fn get_focused_application() -> Option<Application> {
+pub fn get_focused_application(_app_handle: tauri::AppHandle) -> Option<Application> {
     let ns_application = get_focused_ns_application()?;
     let application_path = get_path_from_ns_application(ns_application)?;
 
