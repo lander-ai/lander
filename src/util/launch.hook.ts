@@ -126,9 +126,9 @@ export const useLaunch = () => {
 
     setCommandSections(await getCommandSections());
 
-    const hotkey = (await StorageService.shared.get(
-      "main_window_hotkey"
-    )) as string;
+    const hotkey = (await StorageService.shared.get("main_window_hotkey")) as
+      | string
+      | null;
 
     if (hotkey) {
       await InvokeService.shared.registerMainWindowHotkey(hotkey);
