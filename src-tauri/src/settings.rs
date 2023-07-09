@@ -12,7 +12,7 @@ use {
 };
 
 #[tauri::command]
-pub fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
+pub async fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
     #[cfg(target_os = "macos")]
     crate::util::set_activation_policy(
         NSApplicationActivationPolicy::NSApplicationActivationPolicyRegular,
