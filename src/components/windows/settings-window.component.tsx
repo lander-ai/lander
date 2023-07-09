@@ -3,23 +3,32 @@ import { styled } from "solid-styled-components";
 import { SettingsGeneral, SettingsHeader } from "~/components/modules";
 import { SettingsAbout } from "~/components/modules/settings/settings-about.component";
 import { SettingsAccount } from "~/components/modules/settings/settings-account.component";
+import { __macos__, __windows__ } from "~/constants";
 import { InvokeService } from "~/services";
 import { ThemeMode, themeStore } from "~/store";
 import { SettingsView } from "~/types";
 import { cssTheme } from "~/util";
 
 const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
+  width: 100vw;
   height: 100vh;
   box-sizing: border-box;
-  border-radius: 12px;
-  border: 0.5px solid ${(props) => props.theme?.colors.gray2};
+  border-radius: ${__macos__ ? "12px" : "0"};
+  border: ${(props) =>
+    __macos__ ? "0.5px solid props.theme?.colors.gray2" : undefined};
 
   ${(props) =>
-    cssTheme(
-      props.themeMode,
-      "background: rgba(29, 29, 32, 0.8)",
-      "background: rgba(215, 220, 228, 0.8)"
-    )};
+    __macos__
+      ? cssTheme(
+          props.themeMode,
+          "background: rgba(29, 29, 32, 0.8)",
+          "background: rgba(215, 220, 228, 0.8)"
+        )
+      : cssTheme(
+          props.themeMode,
+          "background: rgba(19, 19, 22, 1)",
+          "background: rgba(215, 220, 228, 1)"
+        )};
 `;
 
 const SContentWrapper = styled("div")`
@@ -45,6 +54,7 @@ const STitleBar = styled("div")`
 
 export const SettingsWindow = () => {
   const { themeMode } = themeStore;
+
   const [view, setView] = createSignal(
     (() => {
       const searchParams = new URLSearchParams(location.search);
@@ -60,7 +70,9 @@ export const SettingsWindow = () => {
   );
 
   onMount(() => {
-    InvokeService.shared.openSettingsWindow();
+    requestAnimationFrame(() => {
+      InvokeService.shared.openSettingsWindow();
+    });
   });
 
   return (

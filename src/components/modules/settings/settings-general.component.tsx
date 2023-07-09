@@ -18,7 +18,7 @@ import themeDarkModeImage from "~/assets/settings/theme-dark-mode.webp";
 import themeLightModeImage from "~/assets/settings/theme-light-mode.webp";
 import themeSystemModeImage from "~/assets/settings/theme-system-mode.webp";
 import { Button, Checkbox, Hotkey, Text } from "~/components/atoms";
-import { InvokeService, StorageService } from "~/services";
+import { InvokeService, SettingsService } from "~/services";
 import { ThemeMode, themeStore } from "~/store";
 
 const SRow = styled("div")<GridProps>`
@@ -66,11 +66,11 @@ export const SettingsGeneral: Component = () => {
   const [autostartRef, setAutostartRef] = createSignal<HTMLInputElement>();
 
   const [mainWindowHotkey] = createResource(
-    () => StorageService.shared.get("main_window_hotkey") as Promise<string>
+    () => SettingsService.shared.get("main_window_hotkey") as Promise<string>
   );
 
   onMount(async () => {
-    const theme = (await StorageService.shared.get("theme")) as ThemeMode;
+    const theme = (await SettingsService.shared.get("theme")) as ThemeMode;
 
     setThemeMode(theme || ThemeMode.System);
   });
@@ -100,9 +100,9 @@ export const SettingsGeneral: Component = () => {
 
     await InvokeService.shared.registerMainWindowHotkey(tauriHotkey);
 
-    await StorageService.shared.set("main_window_hotkey", tauriHotkey);
+    await SettingsService.shared.set("main_window_hotkey", tauriHotkey);
 
-    await StorageService.shared.save();
+    await SettingsService.shared.save();
   };
 
   const handleChangeTheme = async (theme: ThemeMode) => {
@@ -110,8 +110,8 @@ export const SettingsGeneral: Component = () => {
   };
 
   const handleRelaunch = async () => {
-    await StorageService.shared.set("theme", themeMode());
-    await StorageService.shared.save();
+    await SettingsService.shared.set("theme", themeMode());
+    await SettingsService.shared.save();
     await relaunch();
   };
 
@@ -141,6 +141,7 @@ export const SettingsGeneral: Component = () => {
             <Hotkey
               onChange={handleRegisterHotkey}
               defaultValue={mainWindowHotkey()}
+              recommendedHotkey={["Alt", "Space"]}
             />
             <Text.Callout mt="8px" color="gray">
               Set hotkey to launch Lander

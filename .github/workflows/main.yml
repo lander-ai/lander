@@ -12,6 +12,10 @@ jobs:
         platform:
           - os: macos-latest
             target: universal-apple-darwin
+            bundles: app dmg updater
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bundles: nsis updater
 
     runs-on: ${{ matrix.platform.os }}
 
@@ -80,7 +84,7 @@ jobs:
           value: "Lander (Preview)"
 
       - name: Build app
-        run: pnpm build --target ${{ matrix.platform.target }}
+        run: pnpm build --target ${{ matrix.platform.target }} --bundles ${{ matrix.platform.bundles }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_STAGE: ${{ vars.STAGE }}
@@ -102,6 +106,15 @@ jobs:
             ./src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app.tar.gz
             ./src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app.tar.gz.sig
             ./src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+
+      - uses: actions/upload-artifact@v3
+        if: matrix.platform.target == 'x86_64-pc-windows-msvc'
+        with:
+          name: artifacts
+          path: |
+            ./src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.nsis.zip
+            ./src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.nsis.zip.sig
+            ./src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
 
   publish:
     needs: build

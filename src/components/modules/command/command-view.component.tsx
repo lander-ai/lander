@@ -16,8 +16,12 @@ const SWrapper = styled("div")`
 
 export const CommandView: Component = () => {
   const { view } = router;
-  const { searchResults, highlightedCommand, setHighlightedCommand } =
-    commandStore;
+  const {
+    searchResults,
+    highlightedCommand,
+    setHighlightedCommand,
+    commandSections,
+  } = commandStore;
 
   let wrapperRef: HTMLDivElement | undefined;
 
@@ -62,6 +66,16 @@ export const CommandView: Component = () => {
         (highlightedElementY <= prevY || highlightedElementY <= searchHeight) &&
         highlightedElementY < wrapperHeight - footerHeight
       ) {
+        const allCommands = commandSections().flatMap(
+          (commandSection) => commandSection.commands
+        );
+        const isFirstCommand = allCommands[0]?.id === highlightedCommandId;
+
+        if (isFirstCommand) {
+          wrapperRef.scrollTo({ top: 0 });
+          return;
+        }
+
         if (highlightedElementY < searchHeight + scrollPadding) {
           if (
             highlightedElement.parentNode?.firstChild === highlightedElement
@@ -95,6 +109,16 @@ export const CommandView: Component = () => {
       }
 
       if (highlightedElementY > wrapperHeight - footerHeight) {
+        const allCommands = commandSections().flatMap(
+          (commandSection) => commandSection.commands
+        );
+        const isLastCommand = allCommands.at(-1)?.id === highlightedCommandId;
+
+        if (isLastCommand) {
+          wrapperRef.scrollTo({ top: Number.MAX_SAFE_INTEGER });
+          return;
+        }
+
         wrapperRef.scrollTo({
           top:
             highlightedElementY +

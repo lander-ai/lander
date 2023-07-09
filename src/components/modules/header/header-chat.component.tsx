@@ -1,6 +1,7 @@
 import { Component, createEffect, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { Button, Text } from "~/components/atoms";
+import { __macos__ } from "~/constants";
 import { useUser } from "~/queries";
 import { router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
@@ -72,7 +73,9 @@ export const HeaderChat: Component = () => {
         </Show>
 
         <Show when={!user.data?.subscription}>
-          <Text.Caption color="gray">Press ⌥ for shortcuts</Text.Caption>
+          <Text.Caption color="gray">
+            Press {__macos__ ? "⌥" : "⎇"} for shortcuts
+          </Text.Caption>
         </Show>
       </SRightWrapper>
     </SWrapper>

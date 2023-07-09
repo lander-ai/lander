@@ -1,12 +1,15 @@
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
+
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::{cmp, fs};
 use tauri::{Manager, PhysicalPosition, PhysicalSize, Position, Size, Theme, Wry};
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_store::{with_store, StoreCollection};
 use webdriver_install::Driver;
-
-#[cfg(target_os = "windows")]
-use window_vibrancy::apply_blur;
 
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
@@ -27,11 +30,13 @@ fn main() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .manage(panel::State::default())
         .manage(stream::State::default())
+        .manage(command::application::State::default())
         .invoke_handler(tauri::generate_handler![
             panel::init_panel,
             panel::show_panel,
             panel::hide_panel,
             panel::toggle_panel,
+            util::print,
             settings::open_settings_window,
             settings::register_main_window_hotkey,
             settings::fetch_user,
@@ -49,12 +54,12 @@ fn main() {
         .setup(move |app| {
             #[cfg(not(debug_assertions))]
             {
-                let updater_app_handler = app.app_handle().clone();
+                let updater_app_handle = app.app_handle().clone();
 
                 tauri::async_runtime::spawn(async move {
                     let check_for_updates = async move {
                         loop {
-                            let builder = tauri::updater::builder(updater_app_handler.clone())
+                            let builder = tauri::updater::builder(updater_app_handle.clone())
                                 .target(if cfg!(target_os = "macos") {
                                     "darwin-universal".to_string()
                                 } else {
@@ -64,7 +69,7 @@ fn main() {
                             if let Ok(update) = builder.check().await {
                                 if update.is_update_available() {
                                     update.download_and_install().await.unwrap();
-                                    updater_app_handler.restart();
+                                    updater_app_handle.restart();
                                 }
                             }
 
@@ -84,7 +89,7 @@ fn main() {
             with_store(
                 app.app_handle(),
                 app.state::<StoreCollection<Wry>>(),
-                PathBuf::from("store.dat"),
+                PathBuf::from("settings.json"),
                 |store| {
                     let theme = match store.get("theme") {
                         Some(theme) => {
@@ -153,15 +158,44 @@ fn main() {
                     .expect("error applying vibrancy");
 
                     #[cfg(target_os = "windows")]
-                    apply_blur(&window, Some((18, 18, 18, 125))).expect("error applying vibrancy");
+                    {
+                        let window_blur_app_handle = app.app_handle().clone();
+                        main_window.on_window_event(move |event| {
+                            if matches!(event, tauri::WindowEvent::Focused(false)) {
+                                panel::hide_panel(window_blur_app_handle.clone());
+                            }
+                        });
+                    }
 
-                    let get_installed_applications_request_window_listener = main_window.clone();
-                    main_window.listen("get_installed_applications_request", move |_event| {
-                        let payload = command::get_installed_applications();
-                        get_installed_applications_request_window_listener
-                            .emit("get_installed_applications_response", payload)
-                            .unwrap();
-                    });
+                    #[cfg(target_os = "windows")]
+                    {
+                        let focused_application_app_handle = app.app_handle().clone();
+                        let focused_application_main_window = main_window.clone();
+
+                        tauri::async_runtime::spawn(async move {
+                            let set_focused_window = async move {
+                                loop {
+                                    if let Ok(is_window_visible) =
+                                        focused_application_main_window.is_visible()
+                                    {
+                                        if !is_window_visible {
+                                            command::application::windows::set_focused_application(
+                                                focused_application_app_handle.clone(),
+                                            )
+                                            .await;
+                                        } else {
+                                            tokio::time::sleep(tokio::time::Duration::from_millis(
+                                                100,
+                                            ))
+                                            .await;
+                                        }
+                                    }
+                                }
+                            };
+
+                            tokio::spawn(set_focused_window);
+                        });
+                    }
 
                     let app_cache_dir = app.path_resolver().app_cache_dir().unwrap();
                     let webdriver_dir = app_cache_dir.join("webdrivers");
@@ -179,6 +213,21 @@ fn main() {
                 },
             )
             .unwrap();
+
+            let get_installed_applications_request_app_handle = Arc::new(app.app_handle().clone());
+            app.listen_global("get_installed_applications_request", move |_event| {
+                let app_handle = Arc::clone(&get_installed_applications_request_app_handle);
+
+                tauri::async_runtime::spawn(async move {
+                    let payload =
+                        command::get_installed_applications(app_handle.as_ref().clone()).await;
+
+                    app_handle
+                        .as_ref()
+                        .emit_all("get_installed_applications_response", payload)
+                        .unwrap();
+                });
+            });
 
             Ok(())
         })

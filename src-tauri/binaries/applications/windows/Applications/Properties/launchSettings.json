@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Applications": {
+        "commandName": "Project",
+        //"commandLineArgs": "list",
+        "commandLineArgs": "focused-application"
+        //"commandLineArgs": "open Microsoft.BingNews_8wekyb3d8bbwe!AppexNews"
+        //"commandLineArgs": "extract-icon Microsoft.BingNews_8wekyb3d8bbwe!AppexNews \"C:\\Users\\agni\\Desktop\\test.png\""
+    }
+  }
+}

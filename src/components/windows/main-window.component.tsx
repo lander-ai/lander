@@ -7,13 +7,14 @@ import {
   Footer,
   Header,
 } from "~/components/modules";
+import { __macos__ } from "~/constants";
 import { router, ThemeMode, themeStore, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { cssTheme, useKeystrokeHandler, useLaunch } from "~/util";
 
 const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
-  width: calc(100vw);
-  height: calc(100vh);
+  width: ${__macos__ ? "100vw" : "calc(100vw - 1px)"};
+  height: ${__macos__ ? "100vh" : "calc(100vh - 1px)"};
   box-sizing: border-box;
   border-radius: 12px;
   border: 0.5px solid ${(props) => props.theme?.colors.gray2};
@@ -21,11 +22,17 @@ const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
   overflow: hidden;
 
   ${(props) =>
-    cssTheme(
-      props.themeMode,
-      "background: rgba(29, 29, 32, 0.8)",
-      "background: rgba(215, 220, 228, 0.8)"
-    )};
+    __macos__
+      ? cssTheme(
+          props.themeMode,
+          "background: rgba(29, 29, 32, 0.8)",
+          "background: rgba(215, 220, 228, 0.8)"
+        )
+      : cssTheme(
+          props.themeMode,
+          "background: rgba(19, 19, 22, 1)",
+          "background: rgba(215, 220, 228, 1)"
+        )};
 `;
 
 const SContentWrapper = styled("div")<{ view: View }>`

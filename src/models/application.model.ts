@@ -1,3 +1,4 @@
+import { __macos__, __windows__ } from "~/constants";
 import { InvokeService } from "~/services";
 import { Command, CommandType } from "./command.model";
 
@@ -37,7 +38,11 @@ export class Application implements ApplicationData {
         icon: this.icon,
         application: this,
         onClick: () => {
-          InvokeService.shared.launchApplication(this.id);
+          if (__macos__) {
+            InvokeService.shared.launchApplication(this.id);
+          } else {
+            InvokeService.shared.hidePanel();
+          }
         },
       });
     }

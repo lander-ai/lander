@@ -1,27 +1,28 @@
-mod application;
+pub mod application;
 
 pub fn setup(app_handle: tauri::AppHandle) {
     application::setup(app_handle);
 }
 
 #[tauri::command]
-pub fn get_installed_applications() -> String {
-    let applications = application::get_installed_applications();
+pub async fn get_installed_applications(app_handle: tauri::AppHandle) -> String {
+    let applications = application::get_installed_applications(app_handle).await;
+
     let serialized_result = serde_json::to_string(&applications).expect("error deserializing json");
     serialized_result
 }
 
 #[tauri::command]
-pub fn get_focused_application() -> String {
-    let application = application::get_focused_application();
+pub fn get_focused_application(app_handle: tauri::AppHandle) -> String {
+    let application = application::get_focused_application(app_handle);
     let serialized_result = serde_json::to_string(&application).expect("error deserializing json");
     serialized_result
 }
 
 #[tauri::command]
 pub fn launch_application(app_handle: tauri::AppHandle, id: &str) {
-    crate::panel::hide_panel(app_handle);
-    application::launch_application(id);
+    crate::panel::hide_panel(app_handle.clone());
+    application::launch_application(id, app_handle);
 }
 
 #[tauri::command]
