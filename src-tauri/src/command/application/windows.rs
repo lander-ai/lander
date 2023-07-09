@@ -61,13 +61,13 @@ fn get_application_from_windows_application(
 
     let name = windows_application.name;
 
-    let icon_path = if windows_application.uwp {
+    let icon_id = if windows_application.uwp {
         id.clone()
     } else {
         get_start_menu_app_id(Path::new(&windows_application.path), app_handle.clone())
     };
 
-    let icon = get_application_icon_path(app_handle, icon_path)
+    let icon = get_application_icon_path(app_handle, icon_id)
         .unwrap()
         .display()
         .to_string();
@@ -111,17 +111,23 @@ fn save_icon_as_png(input_path: &str, output_path: &Path) {
 async fn store_icons(app_handle: tauri::AppHandle) {
     if let Some(application_data_icon_path) = get_application_data_icon_path(app_handle.clone()) {
         if fs::create_dir_all(&application_data_icon_path).is_ok() {
-            let applications = get_windows_applications().await;
+            let windows_applications = get_windows_applications().await;
 
-            for application in applications {
-                let target_icon_path = if application.uwp {
-                    application.id
+            for windows_application in windows_applications {
+                let target_icon_path = if windows_application.uwp {
+                    windows_application.id.clone()
                 } else {
-                    get_start_menu_app_id(Path::new(&application.path), app_handle.clone())
+                    windows_application.path.clone()
+                };
+
+                let icon_id = if windows_application.uwp {
+                    windows_application.id
+                } else {
+                    get_start_menu_app_id(Path::new(&windows_application.path), app_handle.clone())
                 };
 
                 if let Some(project_icon_path) =
-                    get_application_icon_path(app_handle.clone(), target_icon_path.clone())
+                    get_application_icon_path(app_handle.clone(), icon_id.clone())
                 {
                     save_icon_as_png(&target_icon_path, &project_icon_path);
                 }
