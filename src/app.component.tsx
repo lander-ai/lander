@@ -5,7 +5,7 @@ import { DefaultTheme, styled, ThemeProvider } from "solid-styled-components";
 import { PromptProvider } from "./components";
 import { getTheme } from "./components/theme";
 import { MainWindow, SettingsWindow } from "./components/windows";
-import { StorageService } from "./services";
+import { SettingsService } from "./services";
 import { ThemeMode, themeStore } from "./store";
 
 const queryClient = new QueryClient({
@@ -40,7 +40,7 @@ export const App: Component = () => {
 
   onMount(async () => {
     const themeMode =
-      ((await StorageService.shared.get("theme")) as ThemeMode) ||
+      ((await SettingsService.shared.get("theme")) as ThemeMode) ||
       ThemeMode.System;
 
     setThemeMode(themeMode);

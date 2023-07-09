@@ -109,7 +109,7 @@ pub fn register_main_window_hotkey(
     with_store(
         app_handle.clone(),
         stores,
-        PathBuf::from("store.dat"),
+        PathBuf::from("settings.json"),
         |store| {
             let prev_hotkey = match store.get("main_window_hotkey") {
                 Some(value) => Some(value.as_str().unwrap()),

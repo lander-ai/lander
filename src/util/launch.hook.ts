@@ -6,7 +6,7 @@ import {
   EventKey,
   EventService,
   InvokeService,
-  StorageService,
+  SettingsService,
 } from "~/services";
 import { HTTPError, NetworkService } from "~/services/network.service";
 import { commandStore, mouseStore, queryStore, router, View } from "~/store";
@@ -58,9 +58,7 @@ export const useLaunch = () => {
       return false;
     }
 
-    let deviceID = (await StorageService.shared.get("device_id")) as
-      | string
-      | null;
+    let deviceID = localStorage.getItem("device_id");
 
     try {
       await NetworkService.shared.load(User.requests.whoami());
@@ -75,7 +73,7 @@ export const useLaunch = () => {
 
     if (!deviceID || !localStorage.getItem("t")) {
       deviceID = crypto.randomUUID();
-      await StorageService.shared.set("device_id", deviceID);
+      localStorage.setItem("device_id", deviceID);
       await NetworkService.shared.load(User.requests.anonymous(deviceID));
     }
 
@@ -126,7 +124,7 @@ export const useLaunch = () => {
 
     setCommandSections(await getCommandSections());
 
-    const hotkey = (await StorageService.shared.get("main_window_hotkey")) as
+    const hotkey = (await SettingsService.shared.get("main_window_hotkey")) as
       | string
       | null;
 
