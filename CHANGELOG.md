@@ -1,5 +1,13 @@
 
 
+## [0.0.1-preview.5](https://github.com/lander-ai/lander/compare/v0.0.1-preview.4...v0.0.1-preview.5) (2023-07-07)
+
+
+### Bug Fixes
+
+* improve offline status checks ([99e0000](https://github.com/lander-ai/lander/commit/99e00003fbcda7968f318577f6ec1c65e17e2461))
+* parse multiple sse events in chunk ([fc234ad](https://github.com/lander-ai/lander/commit/fc234add322c5a120783b415d1f58e0011f61519))
+
 ## [0.0.1-preview.4](https://github.com/lander-ai/lander/compare/v0.0.1-preview.3...v0.0.1-preview.4) (2023-07-07)
 
 
