@@ -84,7 +84,7 @@ fn main() {
             with_store(
                 app.app_handle(),
                 app.state::<StoreCollection<Wry>>(),
-                PathBuf::from("store.dat"),
+                PathBuf::from("settings.json"),
                 |store| {
                     let theme = match store.get("theme") {
                         Some(theme) => {

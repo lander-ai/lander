@@ -1,7 +1,7 @@
 import { Store } from "tauri-plugin-store-api";
 
-export class StorageService {
-  static shared = new Store("store.dat");
+export class SettingsService {
+  static shared = new Store("settings.json");
 
   private constructor() {}
 }

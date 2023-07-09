@@ -14,7 +14,7 @@ import {
   User,
 } from "~/models";
 import { useUser } from "~/queries";
-import { InvokeService, StorageService } from "~/services";
+import { InvokeService } from "~/services";
 import { NetworkService } from "~/services/network.service";
 
 const SWrapper = styled("div")`
@@ -242,11 +242,9 @@ export const SettingsAccountProfile: Component<Props> = (props) => {
 
                   await NetworkService.shared.load(User.requests.delete());
 
-                  const deviceID = (await StorageService.shared.get(
-                    "device_id"
-                  )) as string;
+                  const deviceID = localStorage.getItem("device_id");
                   await NetworkService.shared.load(
-                    User.requests.anonymous(deviceID)
+                    User.requests.anonymous(deviceID!)
                   );
 
                   InvokeService.shared.fetchUser();
