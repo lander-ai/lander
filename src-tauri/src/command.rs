@@ -6,10 +6,6 @@ pub fn setup(app_handle: tauri::AppHandle) {
 
 #[tauri::command]
 pub async fn get_installed_applications(app_handle: tauri::AppHandle) -> String {
-    #[cfg(target_os = "macos")]
-    let applications = application::get_installed_applications(app_handle);
-
-    #[cfg(target_os = "windows")]
     let applications = application::get_installed_applications(app_handle).await;
 
     let serialized_result = serde_json::to_string(&applications).expect("error deserializing json");

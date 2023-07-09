@@ -6,7 +6,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::{cmp, fs};
-use tauri::{Manager, PhysicalPosition, PhysicalSize, Position, Size, Theme, WindowEvent, Wry};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Position, Size, Theme, Wry};
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_store::{with_store, StoreCollection};
 use webdriver_install::Driver;
@@ -161,7 +161,7 @@ fn main() {
                     {
                         let window_blur_app_handle = app.app_handle().clone();
                         main_window.on_window_event(move |event| {
-                            if matches!(event, WindowEvent::Focused(false)) {
+                            if matches!(event, tauri::WindowEvent::Focused(false)) {
                                 panel::hide_panel(window_blur_app_handle.clone());
                             }
                         });

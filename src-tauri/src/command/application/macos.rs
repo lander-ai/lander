@@ -22,6 +22,7 @@ use objc::{
     sel, sel_impl,
 };
 use plist::{Dictionary, Value};
+use std::sync::Mutex;
 use std::{
     ffi::c_void,
     process::{Command, Stdio},
@@ -31,7 +32,7 @@ use std::{fs, path::Path, path::PathBuf};
 use crate::command::application::Application;
 
 #[derive(Default)]
-pub struct State(pub Mutex<None>);
+pub struct State(pub Mutex<Option<()>>);
 
 fn search_for_applications(path: &Path) -> Vec<PathBuf> {
     use regex::Regex;

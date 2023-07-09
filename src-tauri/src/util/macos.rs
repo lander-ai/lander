@@ -4,8 +4,9 @@ use objc::{msg_send, sel, sel_impl};
 
 #[cfg(target_os = "macos")]
 pub fn set_activation_policy(policy: NSApplicationActivationPolicy) {
-    let app = unsafe { NSApplication::sharedApplication(nil) };
-
-    let _: () = msg_send![app, setActivationPolicy: policy];
-    app.activateIgnoringOtherApps_(NO);
+    unsafe {
+        let app = NSApplication::sharedApplication(nil);
+        let _: () = msg_send![app, setActivationPolicy: policy];
+        app.activateIgnoringOtherApps_(NO);
+    }
 }

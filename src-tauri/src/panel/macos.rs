@@ -38,9 +38,9 @@ pub fn hide_panel(app_handle: AppHandle<Wry>) {
 pub fn toggle_panel(app_handle: AppHandle<Wry>) {
     let panel = get_panel(app_handle.clone());
 
-    if panel.is_visible().unwrap() {
+    if panel.is_visible() {
         hide_panel(app_handle);
     } else {
-        show_panel(app_handle).await;
+        show_panel(app_handle);
     }
 }
