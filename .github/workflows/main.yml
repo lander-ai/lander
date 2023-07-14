@@ -56,16 +56,34 @@ jobs:
       - name: Install NodeJS dependencies
         run: pnpm i
 
-      - name: Increment version
+      - name: Check git status
+        run: git status
+
+      - name: Increment version (*nix)
+        if: runner.os != 'Windows'
         run: |
-          if [ "${{ vars.STAGE }}" == "production" ]; then 
+          if [ "${{ vars.STAGE }}" == "production" ]; then
             pnpm release
           else 
             pnpm release --preRelease=preview
           fi
 
-      - name: Get version
+      - name: Increment version (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          if ($env:STAGE -eq "production") (
+            pnpm release
+          ) else (
+            pnpm release --preRelease=preview
+          )
+
+      - name: Get version (*nix)
+        if: runner.os != 'Windows'
         run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: Get version (Windows)
+        if: runner.os != 'Windows'
+        run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $env:GITHUB_ENV
 
       - name: Set updates endpoint
         uses: jossef/action-set-json-field@v2.1
@@ -150,7 +168,8 @@ jobs:
       - name: Install NodeJS dependencies
         run: pnpm i
 
-      - name: Increment version
+      - name: Increment version (*nix)
+        if: runner.os != 'Windows'
         run: |
           if [ "${{ vars.STAGE }}" == "production" ]; then
             pnpm release
@@ -158,8 +177,22 @@ jobs:
             pnpm release --preRelease=preview
           fi
 
-      - name: Get version
+      - name: Increment version (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          if ($env:STAGE -eq "production") (
+            pnpm release
+          ) else (
+            pnpm release --preRelease=preview
+          )
+
+      - name: Get version (*nix)
+        if: runner.os != 'Windows'
         run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: Get version (Windows)
+        if: runner.os != 'Windows'
+        run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $env:GITHUB_ENV
 
       - uses: actions/download-artifact@v3
         with:
