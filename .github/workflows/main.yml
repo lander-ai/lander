@@ -24,6 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Init git config
+        run: |
+          git config user.name "github_actions"
+          git config user.email "developer@lander1.ai"
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
