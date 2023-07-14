@@ -2,14 +2,22 @@ extern crate clipboard;
 
 use clipboard::{ClipboardContext, ClipboardProvider};
 use rdev::{simulate, EventType, Key};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{thread, time};
 
-#[cfg_attr(macos, path = "macos.rs")]
+#[cfg(target_os = "macos")]
 mod macos;
+#[cfg(target_os = "macos")]
 use macos as application;
 
-#[derive(Debug, Serialize)]
+#[cfg(target_os = "windows")]
+pub mod windows;
+#[cfg(target_os = "windows")]
+use self::windows as application;
+
+pub use application::State;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Application {
     id: String,
     name: String,
@@ -19,20 +27,24 @@ pub struct Application {
     focused_text: Option<String>,
 }
 
-pub fn get_installed_applications() -> Vec<Application> {
-    application::get_installed_applications()
+pub async fn get_installed_applications(app_handle: tauri::AppHandle) -> Vec<Application> {
+    #[cfg(target_os = "macos")]
+    return application::get_installed_applications(app_handle);
+
+    #[cfg(target_os = "windows")]
+    application::get_installed_applications(app_handle).await
 }
 
-pub fn launch_application(id: &str) {
-    application::launch_application(id);
+pub fn launch_application(id: &str, app_handle: tauri::AppHandle) {
+    application::launch_application(id, app_handle);
 }
 
 pub fn setup(app_handle: tauri::AppHandle) {
     application::setup(app_handle);
 }
 
-pub fn get_focused_application() -> Option<Application> {
-    application::get_focused_application()
+pub fn get_focused_application(app_handle: tauri::AppHandle) -> Option<Application> {
+    application::get_focused_application(app_handle)
 }
 
 fn send_key(event_type: &EventType) {

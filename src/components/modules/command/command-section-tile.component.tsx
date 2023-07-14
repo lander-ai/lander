@@ -10,7 +10,7 @@ const SCommandTilesWrapper = styled("div")`
   gap: 4px;
 
   &:last-child > :last-child {
-    margin-bottom: 44px;
+    margin-bottom: 34px;
   }
 `;
 

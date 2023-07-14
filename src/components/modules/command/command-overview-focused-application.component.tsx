@@ -17,6 +17,7 @@ const SWrapper = styled("div")`
 const SApplicationIcon = styled("img")`
   height: 24px;
   width: 24px;
+  object-fit: contain;
 `;
 
 const SSubtitle = styled(Text.Callout)`

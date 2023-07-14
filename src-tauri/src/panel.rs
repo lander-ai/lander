@@ -1,9 +1,15 @@
 use std::sync::Once;
 use tauri::{AppHandle, Window, Wry};
 
-#[cfg_attr(macos, path = "macos.rs")]
+#[cfg(target_os = "macos")]
 mod macos;
+#[cfg(target_os = "macos")]
 use macos as panel;
+
+#[cfg(target_os = "windows")]
+mod windows;
+#[cfg(target_os = "windows")]
+use self::windows as panel;
 
 pub use panel::State;
 

@@ -6,18 +6,21 @@ use tauri::{
 use tauri_plugin_store::{with_store, StoreCollection};
 
 #[cfg(target_os = "macos")]
-use cocoa::appkit::NSApplicationActivationPolicy;
-#[cfg(target_os = "macos")]
-use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
+use {
+    cocoa::appkit::NSApplicationActivationPolicy,
+    window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial},
+};
 
 #[tauri::command]
-pub fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
+pub async fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
     #[cfg(target_os = "macos")]
     crate::util::set_activation_policy(
         NSApplicationActivationPolicy::NSApplicationActivationPolicyRegular,
     );
 
     if let Some(settings_window) = app_handle.get_window("settings") {
+        app_handle.get_window("main").unwrap().hide().unwrap();
+        settings_window.show().unwrap();
         settings_window.set_focus().unwrap();
     } else {
         let mut window_name = String::from("settings.html");
@@ -26,18 +29,25 @@ pub fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
             window_name.push_str(&format!("?view={}", view));
         }
 
-        let settings_window = tauri::WindowBuilder::new(
+        let mut settings_window_builder = tauri::WindowBuilder::new(
             &app_handle,
             "settings",
             tauri::WindowUrl::App(window_name.into()),
-        )
-        .visible(false)
-        .title("Lander")
-        .title_bar_style(tauri::TitleBarStyle::Overlay)
-        .resizable(false)
-        .transparent(true)
-        .build()
-        .unwrap();
+        );
+
+        settings_window_builder = settings_window_builder
+            .visible(false)
+            .title("Lander")
+            .resizable(false)
+            .transparent(true);
+
+        #[cfg(target_os = "macos")]
+        {
+            settings_window_builder =
+                settings_window_builder.title_bar_style(tauri::TitleBarStyle::Overlay);
+        }
+
+        let settings_window = settings_window_builder.build().unwrap();
 
         if let Some(monitor) = settings_window.current_monitor().unwrap() {
             let monitor_size = monitor.size();
@@ -52,10 +62,19 @@ pub fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
                 }))
                 .unwrap();
 
+            #[cfg(target_os = "macos")]
             settings_window
                 .set_position(Position::Physical(PhysicalPosition {
                     x: ((monitor_size.width / 2) - (window_width / 2)) as i32,
                     y: ((monitor_size.height / 2) - (window_height / 2)) as i32,
+                }))
+                .unwrap();
+
+            #[cfg(target_os = "windows")]
+            settings_window
+                .set_position(Position::Physical(PhysicalPosition {
+                    x: ((monitor_size.width / 2) - (window_width / 2)) as i32,
+                    y: ((monitor_size.height / 2) - (window_height / 2) - 32) as i32,
                 }))
                 .unwrap();
         }
@@ -68,9 +87,6 @@ pub fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
             Some(12.0),
         )
         .expect("error applying vibrancy");
-
-        #[cfg(target_os = "windows")]
-        apply_blur(&window, Some((18, 18, 18, 125))).expect("error applying vibrancy");
 
         settings_window.on_window_event(move |event| match event {
             WindowEvent::Destroyed { .. } => {
@@ -93,7 +109,7 @@ pub fn register_main_window_hotkey(
     with_store(
         app_handle.clone(),
         stores,
-        PathBuf::from("store.dat"),
+        PathBuf::from("settings.json"),
         |store| {
             let prev_hotkey = match store.get("main_window_hotkey") {
                 Some(value) => Some(value.as_str().unwrap()),
@@ -110,7 +126,7 @@ pub fn register_main_window_hotkey(
             app_handle
                 .global_shortcut_manager()
                 .register(&hotkey, move || {
-                    crate::panel::toggle_panel(app_handle.app_handle());
+                    crate::panel::toggle_panel(app_handle.clone());
                 })
                 .unwrap_or_default();
 

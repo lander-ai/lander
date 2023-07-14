@@ -15,3 +15,9 @@ export const __api_endpoint__ = __prd__
   : __dev__
   ? "http://localhost:2000/api"
   : (undefined as never);
+
+export const __windows__ = /(Windows|Win)/.test(navigator.platform);
+
+export const __macos__ = /(Mac)/.test(navigator.platform);
+
+export const __linux__ = /(Linux)/.test(navigator.platform);

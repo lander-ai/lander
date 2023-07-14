@@ -19,6 +19,7 @@ const SWrapper = styled("button")<SWrapperProps>`
   grid-auto-flow: column;
   padding: 6px 8px;
   margin: 0;
+  font-family: ${(props) => props.theme?.fontFamily};
   background: ${(props) => props.theme?.colors.gray4};
   opacity: ${(props) => (props.disabled ? 0.6 : undefined)};
   border: ${(props) => `0.5px solid ${props.theme?.colors.gray2}`};

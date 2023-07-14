@@ -19,6 +19,10 @@ export class InvokeService {
     return convertKeysFromSnakeCaseToCamelCase(json) as unknown;
   }
 
+  async print(...data: any[]) {
+    await invoke("print", { data: data.join(", ") });
+  }
+
   async initPanel() {
     await invoke("init_panel");
   }
@@ -72,9 +76,11 @@ export class InvokeService {
       return undefined;
     }
 
-    const application = this.parse(response) as ApplicationData;
+    const application = new Application(
+      this.parse(response) as ApplicationData
+    );
 
-    return new Application(application);
+    return application;
   }
 
   async launchApplication(id: string) {
