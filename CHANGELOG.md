@@ -1,5 +1,27 @@
 
 
+## [0.0.1-preview.6](https://github.com/lander-ai/lander/compare/v0.0.1-preview.5...v0.0.1-preview.6) (2023-07-14)
+
+
+### Bug Fixes
+
+* add macos universal applications binary ([7f8f133](https://github.com/lander-ai/lander/commit/7f8f1332dd7b286bc521fc3ff3999039d8052e37))
+* macos build issues ([31c1c12](https://github.com/lander-ai/lander/commit/31c1c125ccff2685c2a8c5198df2ffc2e9559ca6))
+* storage service hotkey type ([784bbeb](https://github.com/lander-ai/lander/commit/784bbeb0b9ffd1a627b1b9f8d1d4a5a51d3f76fb))
+* windows extract icon ([4394ded](https://github.com/lander-ai/lander/commit/4394dedde77cb45e514b534485a29155ffd68b0c))
+* windows open settings window ([7fcb6af](https://github.com/lander-ai/lander/commit/7fcb6afaac52bcde6147efa88d2e5c5152e12e87))
+
+
+### Features
+
+* add windows build step ([359ba18](https://github.com/lander-ai/lander/commit/359ba18d86a1bc0f24d5a5aa58c39e333e7e8760))
+* add windows support ([10944b9](https://github.com/lander-ai/lander/commit/10944b970f3b7c847a9b734073bc196524e23ef4))
+
+
+### Performance Improvements
+
+* improve windows panel open speed ([6c9f113](https://github.com/lander-ai/lander/commit/6c9f113f11cae96c11085e305f902fd3397fabfa))
+
 ## [0.0.1-preview.5](https://github.com/lander-ai/lander/compare/v0.0.1-preview.4...v0.0.1-preview.5) (2023-07-07)
 
 
