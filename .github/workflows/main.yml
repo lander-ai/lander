@@ -71,11 +71,11 @@ jobs:
       - name: Increment version (Windows)
         if: runner.os == 'Windows'
         run: |
-          if ($env:STAGE -eq "production") (
+          if ($env:STAGE -eq "production") {
             pnpm release
-          ) else (
+          } else {
             pnpm release --preRelease=preview
-          )
+          }
 
       - name: Get version (*nix)
         if: runner.os != 'Windows'
@@ -180,11 +180,11 @@ jobs:
       - name: Increment version (Windows)
         if: runner.os == 'Windows'
         run: |
-          if ($env:STAGE -eq "production") (
+          if ($env:STAGE -eq "production") {
             pnpm release
-          ) else (
+          } else {
             pnpm release --preRelease=preview
-          )
+          }
 
       - name: Get version (*nix)
         if: runner.os != 'Windows'
