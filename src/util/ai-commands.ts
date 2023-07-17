@@ -33,25 +33,12 @@ const handleChat = async (command: Command, prompt: string) => {
   });
 };
 
-const getCommand = (title: string, prompt: string) => {
-  return new Command({
-    get id() {
-      return `ai-${this.title.toLowerCase().replace(" ", "-")}`;
-    },
-    type: CommandType.AI,
-    title,
-    icon,
-    async onClick() {
-      handleChat(new Command(this), prompt);
-    },
-  });
-};
-
 export const chatCommand = new Command({
   id: "ai-chat",
   type: CommandType.AI,
   title: "Chat with AI",
   icon,
+  suggestable: false,
   onClick() {
     const { navigate } = router;
     const { setThread } = chatStore;
@@ -81,9 +68,25 @@ export const getCustomCommand = (focusedApplication: Application) => {
   return new Command({
     id: "ai-custom-command",
     type: CommandType.AI,
+    suggestable: false,
     title: "Custom command",
     subtitle: prompt,
     icon,
+    async onClick() {
+      handleChat(new Command(this), prompt);
+    },
+  });
+};
+
+const getCommand = (title: string, prompt: string) => {
+  return new Command({
+    get id() {
+      return `ai-${this.title.toLowerCase().replace(" ", "-")}`;
+    },
+    type: CommandType.AI,
+    title,
+    icon,
+    suggestable: false,
     async onClick() {
       handleChat(new Command(this), prompt);
     },

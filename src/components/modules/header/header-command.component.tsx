@@ -7,6 +7,11 @@ import {
   onCleanup,
 } from "solid-js";
 import { styled } from "solid-styled-components";
+import {
+  AnalyticsAggregationEvent,
+  AnalyticsEventType,
+  AnalyticsService,
+} from "~/services";
 import { commandStore, queryStore, router, View } from "~/store";
 
 const SSearchInput = styled("input")`
@@ -27,6 +32,9 @@ const SSearchInput = styled("input")`
   }
 `;
 
+let commandEvents: AnalyticsAggregationEvent<AnalyticsEventType.Command>[] = [];
+let commandEventsMaxCount = 0;
+
 export const HeaderCommand: Component = () => {
   const { view } = router;
   const { query, setQuery, setQueryRef } = queryStore;
@@ -41,15 +49,50 @@ export const HeaderCommand: Component = () => {
     setQueryRef(ref);
   });
 
+  createEffect(() => {
+    const handleOnFocus = async () => {
+      if (view() === View.Command) {
+        ref?.select();
+      }
+
+      const now = new Date();
+
+      const lastMonth = new Date();
+      lastMonth.setDate(now.getMonth() - 1);
+
+      commandEvents = await AnalyticsService.shared.aggregateCommandEvents(
+        lastMonth,
+        now
+      );
+
+      commandEventsMaxCount =
+        commandEvents.reduce(
+          (prev, next) => (next.count > prev ? next.count : prev),
+          0
+        ) || 0;
+    };
+
+    window.addEventListener("focus", handleOnFocus);
+
+    onCleanup(() => {
+      window.removeEventListener("focus", handleOnFocus);
+    });
+  });
+
   const fuse = () =>
     new Fuse(
       commandSections()
         .flatMap((command) => command.commands)
         .filter((command) => command.searchable),
-      { keys: ["title"] }
+      {
+        keys: ["title"],
+        includeScore: true,
+        shouldSort: false,
+        threshold: 0.4,
+      }
     );
 
-  const handleInput = (q: string) => {
+  const handleInput = async (q: string) => {
     setQuery(q);
 
     if (!q) {
@@ -62,9 +105,37 @@ export const HeaderCommand: Component = () => {
     }
 
     const result = fuse().search(q);
+
+    const sortedResult =
+      commandEventsMaxCount > 0
+        ? result.sort((a, b) => {
+            const aCount =
+              commandEvents.find(
+                (commandEvent) => commandEvent.event.command.id === a.item.id
+              )?.count || 0;
+
+            const bCount =
+              commandEvents.find(
+                (commandEvent) => commandEvent.event.command.id === b.item.id
+              )?.count || 0;
+
+            if (a.score === undefined || b.score === undefined) {
+              return 0;
+            }
+
+            const aScore =
+              (1 - a.score!) * 0.7 + (aCount / commandEventsMaxCount) * 0.3;
+
+            const bScore =
+              (1 - b.score!) * 0.7 + (bCount / commandEventsMaxCount) * 0.3;
+
+            return aScore > bScore ? -1 : 1;
+          })
+        : result;
+
     batch(() => {
-      setSearchResults(result.map((r) => r.item));
-      setHighlightedCommand(result[0]?.item);
+      setSearchResults(sortedResult.map((r) => r.item));
+      setHighlightedCommand(sortedResult[0]?.item);
     });
   };
 
