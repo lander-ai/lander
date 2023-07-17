@@ -1,8 +1,10 @@
+import { AnalyticsEventType, AnalyticsService } from "~/services";
 import { Application } from "./application.model";
 
 export enum CommandType {
   AI,
   Application,
+  Suggestion,
   Lander,
 }
 
@@ -14,7 +16,8 @@ export class Command {
   subtitle?: string;
   application?: Application;
   searchable = true;
-  onClick: () => void;
+  suggestable = true;
+  onClickMethod: () => void;
 
   constructor(opts: {
     type: CommandType;
@@ -24,6 +27,8 @@ export class Command {
     subtitle?: string;
     application?: Application;
     searchable?: boolean;
+    suggestable?: boolean;
+    suggestion?: boolean;
     onClick: () => void;
   }) {
     this.type = opts.type;
@@ -32,8 +37,26 @@ export class Command {
     this.icon = opts.icon;
     this.subtitle = opts.subtitle;
     this.application = opts.application;
-    this.searchable = opts.searchable || true;
-    this.onClick = opts.onClick.bind(this);
+    this.searchable = opts.searchable ?? true;
+    this.suggestable = opts.suggestable ?? true;
+    this.onClickMethod = opts.onClick.bind(this);
+
+    if (opts.suggestion) {
+      this.searchable = false;
+      this.id = "suggestion-" + this.id;
+    }
+  }
+
+  onClick() {
+    this.onClickMethod();
+
+    AnalyticsService.shared.addEvent({
+      type: AnalyticsEventType.Command,
+      event: {
+        name: "execute",
+        command: { id: this.id.replace("suggestion-", ""), name: this.title },
+      },
+    });
   }
 }
 

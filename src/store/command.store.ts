@@ -17,23 +17,31 @@ export const commandStore = createRoot(() => {
 
   const setCommandSection = (
     type: CommandType,
-    next: CommandSection | undefined
+    next: CommandSection | undefined,
+    index?: number
   ) => {
     let prev = commandSections();
 
-    const sectionIndex = prev?.findIndex((c) => c.type === type);
+    if (prev === undefined) {
+      return;
+    }
 
-    if (sectionIndex !== undefined) {
-      if (!next) {
-        prev = prev.filter((_, index) => index !== sectionIndex);
-      } else if (sectionIndex === -1) {
-        prev.unshift(next);
+    const sectionIndex = prev.findIndex((c) => c.type === type);
+
+    if (!next) {
+      prev = prev.filter((_, index) => index !== sectionIndex);
+    } else if (sectionIndex === -1 && index === undefined) {
+      prev.unshift(next);
+    } else {
+      if (index !== undefined) {
+        prev = prev.filter((commandSection) => commandSection.type !== type);
+        prev.splice(index, 0, next);
       } else {
         prev[sectionIndex] = next;
       }
-
-      mutateCommandSections([...prev]);
     }
+
+    mutateCommandSections([...prev]);
   };
 
   return {

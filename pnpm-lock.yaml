@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@solid-primitives/keyed':
     specifier: ^1.1.9
@@ -23,6 +19,9 @@ dependencies:
   class-transformer:
     specifier: ^0.5.1
     version: 0.5.1
+  dexie:
+    specifier: ^3.2.4
+    version: 3.2.4
   eslint-plugin-solid:
     specifier: ^0.12.1
     version: 0.12.1(eslint@8.38.0)(typescript@4.9.5)
@@ -55,10 +54,10 @@ dependencies:
     version: 5.1.5
   tauri-plugin-autostart-api:
     specifier: github:tauri-apps/tauri-plugin-autostart
-    version: github.com/tauri-apps/tauri-plugin-autostart/f409102d516cdac20bb7dde4300a0e495c61d6f2
+    version: github.com/tauri-apps/tauri-plugin-autostart/59c48c642cea6a854bb1f4181972ad0bfbeb0c75
   tauri-plugin-store-api:
     specifier: github:tauri-apps/tauri-plugin-store
-    version: github.com/tauri-apps/tauri-plugin-store/96e2eb3971c981ece96f0a9e47dad14a2d1d2539
+    version: github.com/tauri-apps/tauri-plugin-store/8a37f08e6c0b7781fc1f0e458f2d0ff18368ac75
   typescript:
     specifier: ^4.9.5
     version: 4.9.5
@@ -2192,6 +2191,11 @@ packages:
   /dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
+    dev: false
+
+  /dexie@3.2.4:
+    resolution: {integrity: sha512-VKoTQRSv7+RnffpOJ3Dh6ozknBqzWw/F3iqMdsZg958R0AS8AnY9x9d1lbwENr0gzeGJHXKcGhAMRaqys6SxqA==}
+    engines: {node: '>=6.0'}
     dev: false
 
   /diff@5.1.0:
@@ -6235,18 +6239,22 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-autostart/f409102d516cdac20bb7dde4300a0e495c61d6f2:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/f409102d516cdac20bb7dde4300a0e495c61d6f2}
+  github.com/tauri-apps/tauri-plugin-autostart/59c48c642cea6a854bb1f4181972ad0bfbeb0c75:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/59c48c642cea6a854bb1f4181972ad0bfbeb0c75}
     name: tauri-plugin-autostart-api
     version: 0.0.0
     dependencies:
       '@tauri-apps/api': 1.4.0
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-store/96e2eb3971c981ece96f0a9e47dad14a2d1d2539:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-store/tar.gz/96e2eb3971c981ece96f0a9e47dad14a2d1d2539}
+  github.com/tauri-apps/tauri-plugin-store/8a37f08e6c0b7781fc1f0e458f2d0ff18368ac75:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-store/tar.gz/8a37f08e6c0b7781fc1f0e458f2d0ff18368ac75}
     name: tauri-plugin-store-api
     version: 0.0.0
     dependencies:
       '@tauri-apps/api': 1.4.0
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
