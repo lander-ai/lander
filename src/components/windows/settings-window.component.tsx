@@ -70,7 +70,7 @@ export const SettingsWindow = () => {
   );
 
   onMount(() => {
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       InvokeService.shared.openSettingsWindow();
     });
   });

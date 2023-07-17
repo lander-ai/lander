@@ -1,5 +1,5 @@
 import { Application, Command, CommandSection, CommandType } from "~/models";
-import { InvokeService } from "~/services";
+import { AnalyticsService, InvokeService } from "~/services";
 import { networkStore } from "~/store/network.store";
 import { aiCommands, chatCommand, getCustomCommand } from "./ai-commands";
 import { landerCommands } from "./lander-commands";
@@ -33,6 +33,7 @@ export const getCommandSection = async (
         const selectTextCommand = focusedApplication.toCommand(CommandType.AI);
         selectTextCommand.id = "ai-select-text";
         selectTextCommand.subtitle = "Select text for AI completions";
+        selectTextCommand.suggestable = false;
         selectTextCommand.searchable = false;
         commands.push(selectTextCommand);
       }
@@ -64,12 +65,59 @@ export const getCommandSection = async (
   }
 };
 
+export const getSuggestionsCommandSection = async (commands: Command[]) => {
+  const now = new Date();
+
+  const lastMonth = new Date();
+  lastMonth.setDate(now.getMonth() - 1);
+
+  const commandEvents = await AnalyticsService.shared.aggregateCommandEvents(
+    lastMonth,
+    now
+  );
+
+  const suggestedCommands = commandEvents
+    ?.sort((a, b) => (a.count < b.count ? 1 : -1))
+    ?.map((commandEvent) => {
+      const command = commands.find(
+        (c) => c.id === commandEvent.event.command.id
+      );
+
+      if (command) {
+        const suggestedCommand = new Command({
+          ...command,
+          suggestion: true,
+          onClick: command.onClickMethod,
+        });
+        return suggestedCommand;
+      }
+    })
+    .filter((command) => command?.suggestable)
+    .slice(0, 4) as Command[] | undefined;
+
+  if (suggestedCommands?.length) {
+    return new CommandSection({
+      type: CommandType.Suggestion,
+      title: "Suggestions",
+      commands: suggestedCommands,
+    });
+  }
+};
+
 export const getCommandSections = async () => {
   const commandSections: CommandSection[] = [];
 
   const aiCommands = await getCommandSection(CommandType.AI);
 
   const applicationCommands = await getCommandSection(CommandType.Application);
+
+  const suggestedCommands = await getSuggestionsCommandSection([
+    ...(applicationCommands?.commands || []),
+  ]);
+
+  if (suggestedCommands) {
+    commandSections.push(suggestedCommands);
+  }
 
   if (aiCommands) {
     commandSections.push(aiCommands);

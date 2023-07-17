@@ -9,10 +9,14 @@ import {
   SettingsService,
 } from "~/services";
 import { HTTPError, NetworkService } from "~/services/network.service";
-import { commandStore, mouseStore, queryStore, router, View } from "~/store";
+import { commandStore, mouseStore, queryStore, router } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { networkStore } from "~/store/network.store";
-import { getCommandSection, getCommandSections } from "./command-sections";
+import {
+  getCommandSection,
+  getCommandSections,
+  getSuggestionsCommandSection,
+} from "./command-sections";
 
 const installedApplicationsEvent = new EventService(
   EventKey.InstalledApplications,
@@ -31,6 +35,7 @@ export const useLaunch = () => {
     setCommandSections,
     setFocusedApplication,
     setHighlightedCommand,
+    commandSections,
   } = commandStore;
   const { queryRef } = queryStore;
   const { view } = router;
@@ -42,7 +47,7 @@ export const useLaunch = () => {
     setChatPluginCountTTL,
     setChatPluginLimit,
   } = chatStore;
-  const { setIsOffline } = networkStore;
+  const { isOffline, setIsOffline } = networkStore;
 
   const user = useUser({ enabled: false });
 
@@ -163,18 +168,33 @@ export const useLaunch = () => {
       const focusedApplication =
         await InvokeService.shared.getFocusedApplication();
 
-      if (view() === View.Command) {
-        queryRef()?.select();
-      }
+      const suggestedCommands = await getSuggestionsCommandSection(
+        commandSections().flatMap((commandSection) => commandSection.commands)
+      );
 
-      batch(async () => {
+      const aiCommandSection = await getCommandSection(CommandType.AI, {
+        focusedApplication,
+      });
+
+      batch(() => {
         setHighlightedCommand(undefined);
-        setFocusedApplication(focusedApplication);
+
+        if (!isOffline()) {
+          setFocusedApplication(focusedApplication);
+          setCommandSection(CommandType.AI, aiCommandSection);
+        }
+
+        if (suggestedCommands) {
+          setCommandSection(
+            CommandType.Suggestion,
+            suggestedCommands,
+            !isOffline() && focusedApplication?.selectedText ? 1 : 0
+          );
+        }
+      });
+
+      setTimeout(async () => {
         setIsOffline(!(await authenticate()));
-        setCommandSection(
-          CommandType.AI,
-          await getCommandSection(CommandType.AI, { focusedApplication })
-        );
       });
     });
 

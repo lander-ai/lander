@@ -11,8 +11,7 @@ use {
     window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial},
 };
 
-#[tauri::command]
-pub async fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
+pub fn handle_open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
     #[cfg(target_os = "macos")]
     crate::util::set_activation_policy(
         NSApplicationActivationPolicy::NSApplicationActivationPolicyRegular,
@@ -23,6 +22,8 @@ pub async fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<Strin
         settings_window.show().unwrap();
         settings_window.set_focus().unwrap();
     } else {
+        app_handle.get_window("main").unwrap().hide().unwrap();
+
         let mut window_name = String::from("settings.html");
 
         if let Some(view) = view {
@@ -38,7 +39,6 @@ pub async fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<Strin
         settings_window_builder = settings_window_builder
             .visible(false)
             .title("Lander")
-            .resizable(false)
             .transparent(true);
 
         #[cfg(target_os = "macos")]
@@ -98,6 +98,18 @@ pub async fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<Strin
             _ => (),
         });
     }
+}
+
+#[cfg(target_os = "macos")]
+#[tauri::command]
+pub fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
+    handle_open_settings_window(app_handle, view);
+}
+
+#[cfg(target_os = "windows")]
+#[tauri::command]
+pub async fn open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
+    handle_open_settings_window(app_handle, view);
 }
 
 #[tauri::command]

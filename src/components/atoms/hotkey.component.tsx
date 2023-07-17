@@ -162,20 +162,42 @@ export const Hotkey: Component<Props> = (props) => {
     props.onChange(props.recommendedHotkey);
   };
 
+  const getReadableKey = (key: string) => {
+    if (key === "Alt") {
+      if (__macos__) {
+        return "OPTION";
+      }
+    }
+
+    if (key === "Super") {
+      if (__macos__) {
+        return "COMMAND";
+      }
+
+      if (__windows__) {
+        return "START";
+      }
+    }
+
+    return key;
+  };
+
   return (
     <SWrapper>
       <SListenerWrapper onClick={() => setIsListening((s) => !s)}>
         <Switch>
           <Match when={isListening() && recording().size}>
             <For each={Array.from(recording())}>
-              {(key) => <SKey>{key}</SKey>}
+              {(key) => <SKey>{getReadableKey(key)}</SKey>}
             </For>
           </Match>
           <Match when={isListening()}>
             <Text.Callout fontWeight="medium">Recording</Text.Callout>
           </Match>
           <Match when={!isListening() && hotkey().size}>
-            <For each={Array.from(hotkey())}>{(key) => <SKey>{key}</SKey>}</For>
+            <For each={Array.from(hotkey())}>
+              {(key) => <SKey>{getReadableKey(key)}</SKey>}
+            </For>
           </Match>
           <Match when>
             <Text.Callout fontWeight="medium">Record</Text.Callout>
