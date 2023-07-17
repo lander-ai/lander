@@ -1,5 +1,21 @@
 
 
+## [0.0.1-preview.7](https://github.com/lander-ai/lander/compare/v0.0.1-preview.6...v0.0.1-preview.7) (2023-07-17)
+
+
+### Bug Fixes
+
+* airport utility bundle id ([48dce9f](https://github.com/lander-ai/lander/commit/48dce9f3983f7f577f094aa3c4a8ddb962bdd1b8))
+* airport utility bundle id ([8779478](https://github.com/lander-ai/lander/commit/87794787004449a88ae9e1b4a0d0d978c44d4ea7))
+* macos displayed key text ([7c3b623](https://github.com/lander-ai/lander/commit/7c3b623f2a8348a257a0a56cbb2aafa395ccfd97))
+* macos settings window not opening ([a7168b3](https://github.com/lander-ai/lander/commit/a7168b383d86c70fe41dfa02e7c2e5fbf4b8282b))
+
+
+### Features
+
+* add suggestions ([981954b](https://github.com/lander-ai/lander/commit/981954bba3c9e834846d903225cda5945a45ddf6))
+* migrate pouch to dexie ([2da8add](https://github.com/lander-ai/lander/commit/2da8addb879e5e278af4d4a94b0067052bdb95ce))
+
 ## [0.0.1-preview.6](https://github.com/lander-ai/lander/compare/v0.0.1-preview.5...v0.0.1-preview.6) (2023-07-14)
 
 
