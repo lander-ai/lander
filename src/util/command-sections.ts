@@ -115,12 +115,12 @@ export const getCommandSections = async () => {
     ...(applicationCommands?.commands || []),
   ]);
 
-  if (aiCommands) {
-    commandSections.push(aiCommands);
-  }
-
   if (suggestedCommands) {
     commandSections.push(suggestedCommands);
+  }
+
+  if (aiCommands) {
+    commandSections.push(aiCommands);
   }
 
   if (applicationCommands) {

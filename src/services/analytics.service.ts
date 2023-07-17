@@ -1,4 +1,4 @@
-import PouchDB from "pouchdb";
+import Dexie, { Table } from "dexie";
 
 export enum AnalyticsEventType {
   Interaction = "interaction",
@@ -35,47 +35,40 @@ export interface AnalyticsAggregationEvent<EventType extends AnalyticsEventType>
 
 type AddEventPayload = Omit<AnalyticsEvent<AnalyticsEventType>, "created_at">;
 
+class AnalyticsDatabase extends Dexie {
+  public event!: Table<AnalyticsEvent<AnalyticsEventType>, number>;
+
+  constructor() {
+    super("lander");
+
+    this.version(1).stores({
+      event: "id++, created_at, type, event",
+    });
+  }
+}
+
 export class AnalyticsService {
   static shared = new AnalyticsService();
 
-  private db = new PouchDB("analytics");
-
-  private constructor() {}
+  private db = new AnalyticsDatabase().event;
 
   async addEvent(data: AddEventPayload) {
     const now = new Date();
 
     const event = {
       ...data,
-      _id: now.toISOString(),
       created_at: now,
     };
 
-    await this.db.put(event);
-  }
-
-  async query<EventType extends AnalyticsEventType>(
-    type: EventType,
-    start: Date,
-    end: Date
-  ) {
-    const response = await this.db.allDocs<AnalyticsEvent<EventType>>({
-      include_docs: true,
-      startkey: start.toISOString(),
-      endkey: end.toISOString(),
-    });
-
-    return response.rows
-      .map((row) => row.doc)
-      .filter((doc) => doc?.type === type) as Array<AnalyticsEvent<EventType>>;
+    await this.db.add(event);
   }
 
   async aggregateCommandEvents(start: Date, end: Date) {
-    const commandEvents = await this.query(
-      AnalyticsEventType.Command,
-      start,
-      end
-    );
+    const commandEvents = await this.db
+      .where("type")
+      .equals(AnalyticsEventType.Command)
+      .and((event) => event.created_at >= start && event.created_at <= end)
+      .toArray();
 
     const result: Array<AnalyticsAggregationEvent<AnalyticsEventType.Command>> =
       [];
