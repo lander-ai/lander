@@ -1,10 +1,12 @@
 import { Component, createEffect, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { Button, Text } from "~/components/atoms";
+import { Button, prompt, Text } from "~/components/atoms";
 import { __macos__ } from "~/constants";
-import { useUser } from "~/queries";
+import { useArchive } from "~/queries";
+import { ThreadService } from "~/services/thread.service";
 import { router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
+import { startNewChat } from "~/util";
 
 const SWrapper = styled("div")`
   display: grid;
@@ -28,17 +30,29 @@ const SBackIconWrapper = styled("div")`
   }
 `;
 
-const SRightWrapper = styled("div")``;
+const SSectionWrapper = styled("div")`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+`;
 
 export const HeaderChat: Component = () => {
-  const user = useUser();
+  const { refetch: refetchArchive } = useArchive({ enabled: false });
 
   const { view, navigate } = router;
-  const { setIsPluginsPanelVisible, selectedPlugins } = chatStore;
+  const {
+    setIsPluginsPanelVisible,
+    isArchiveVisible,
+    setIsArchiveVisible,
+    thread,
+  } = chatStore;
 
-  const handleTogglePlugins = () => {
-    if (view() === View.Chat) {
-      setIsPluginsPanelVisible((prev) => !prev);
+  const handleGoBack = () => {
+    if (isArchiveVisible()) {
+      setIsArchiveVisible(false);
+    } else {
+      navigate(View.Command);
     }
   };
 
@@ -49,35 +63,62 @@ export const HeaderChat: Component = () => {
   });
 
   return (
-    <SWrapper>
-      <SBackIconWrapper
-        onClick={() => {
-          navigate(View.Command);
-        }}
-      >
-        <Text.Callout ml="1px" mb="2px">
-          ←
-        </Text.Callout>
-      </SBackIconWrapper>
+    <>
+      <SWrapper>
+        <SSectionWrapper>
+          <SBackIconWrapper onClick={handleGoBack}>
+            <Text.Callout ml="1px" mb="2px">
+              ←
+            </Text.Callout>
+          </SBackIconWrapper>
+          <Show when={!isArchiveVisible()}>
+            <Text.Caption color="gray">
+              Press {__macos__ ? "⌥" : "⎇"} for shortcuts
+            </Text.Caption>
+          </Show>
+        </SSectionWrapper>
 
-      <SRightWrapper>
-        <Show when={user.data?.subscription}>
-          <Button
-            py="2px"
-            onClick={handleTogglePlugins}
-            shortcutIndex={0}
-            selected={!!selectedPlugins().size}
-          >
-            Plugins
-          </Button>
+        <Show when={!isArchiveVisible()}>
+          <SSectionWrapper>
+            <Button
+              py="2px"
+              onClick={() => setIsArchiveVisible(true)}
+              shortcutIndex={0}
+            >
+              Archive
+            </Button>
+
+            <Show when={thread()?.messages.length}>
+              <Button py="2px" onClick={() => startNewChat()} shortcutIndex={0}>
+                New chat
+              </Button>
+            </Show>
+          </SSectionWrapper>
         </Show>
 
-        <Show when={!user.data?.subscription}>
-          <Text.Caption color="gray">
-            Press {__macos__ ? "⌥" : "⎇"} for shortcuts
-          </Text.Caption>
+        <Show when={isArchiveVisible()}>
+          <SSectionWrapper>
+            <Button
+              py="2px"
+              onClick={() =>
+                prompt({
+                  title: "Clear archived chats",
+                  body: "Are you sure you want to clear your archived chats?",
+                  successText: "Clear",
+                  async onSuccess() {
+                    await ThreadService.shared.removeAll();
+                    await refetchArchive();
+                    prompt.close();
+                  },
+                })
+              }
+              shortcutIndex={0}
+            >
+              Clear archive
+            </Button>
+          </SSectionWrapper>
         </Show>
-      </SRightWrapper>
-    </SWrapper>
+      </SWrapper>
+    </>
   );
 };

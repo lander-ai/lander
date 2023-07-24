@@ -7,11 +7,8 @@ import {
   onCleanup,
 } from "solid-js";
 import { styled } from "solid-styled-components";
-import {
-  AnalyticsAggregationEvent,
-  AnalyticsEventType,
-  AnalyticsService,
-} from "~/services";
+import { AnalyticsEventType } from "~/models";
+import { AnalyticsAggregationEvent, AnalyticsService } from "~/services";
 import { commandStore, queryStore, router, View } from "~/store";
 
 const SSearchInput = styled("input")`
@@ -33,7 +30,6 @@ const SSearchInput = styled("input")`
 `;
 
 let commandEvents: AnalyticsAggregationEvent<AnalyticsEventType.Command>[] = [];
-let commandEventsMaxCount = 0;
 
 export const HeaderCommand: Component = () => {
   const { view } = router;
@@ -64,12 +60,6 @@ export const HeaderCommand: Component = () => {
         lastMonth,
         now
       );
-
-      commandEventsMaxCount =
-        commandEvents.reduce(
-          (prev, next) => (next.count > prev ? next.count : prev),
-          0
-        ) || 0;
     };
 
     window.addEventListener("focus", handleOnFocus);
@@ -104,11 +94,24 @@ export const HeaderCommand: Component = () => {
       return;
     }
 
-    const result = fuse().search(q);
+    const results = fuse().search(q);
+
+    const commandEventsMaxCount =
+      (
+        results
+          .map((result) =>
+            commandEvents.find(
+              (commandEvent) => commandEvent.event.command.id === result.item.id
+            )
+          )
+          .filter(
+            Boolean
+          ) as AnalyticsAggregationEvent<AnalyticsEventType.Command>[]
+      ).reduce((prev, next) => (next.count > prev ? next.count : prev), 0) || 0;
 
     const sortedResult =
       commandEventsMaxCount > 0
-        ? result.sort((a, b) => {
+        ? results.sort((a, b) => {
             const aCount =
               commandEvents.find(
                 (commandEvent) => commandEvent.event.command.id === a.item.id
@@ -131,7 +134,7 @@ export const HeaderCommand: Component = () => {
 
             return aScore > bScore ? -1 : 1;
           })
-        : result;
+        : results;
 
     batch(() => {
       setSearchResults(sortedResult.map((r) => r.item));

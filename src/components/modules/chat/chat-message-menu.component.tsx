@@ -152,7 +152,7 @@ export const ChatMessageMenu: Component<Props> = (props) => {
               shortcutIndex={0}
               onTriggered={handleInsert}
               event="keyup"
-              disabled={!focusedApplication()?.selectedText}
+              disabled={isInsertDisabled()}
             />
           </Text.Caption>
 
@@ -162,7 +162,7 @@ export const ChatMessageMenu: Component<Props> = (props) => {
               shortcutIndex={0}
               onTriggered={handleReplace}
               event="keyup"
-              disabled={!focusedApplication()?.selectedText}
+              disabled={isReplaceDisabled()}
             />
           </Text.Caption>
         </SShortcutsWrapper>

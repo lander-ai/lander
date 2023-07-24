@@ -16,12 +16,8 @@ const SWrapper = styled("div")`
 
 export const CommandView: Component = () => {
   const { view } = router;
-  const {
-    searchResults,
-    highlightedCommand,
-    setHighlightedCommand,
-    commandSections,
-  } = commandStore;
+  const { searchResults, highlightedCommand, setHighlightedCommand } =
+    commandStore;
 
   let wrapperRef: HTMLDivElement | undefined;
 
@@ -55,7 +51,7 @@ export const CommandView: Component = () => {
       }
 
       const footerHeight = 36;
-      const searchHeight = 50;
+      const headerHeight = 50;
       const scrollPadding = 12;
       const commmandTileHeight = highlightedElementHeight;
       const prevY = prevScrollY;
@@ -63,20 +59,18 @@ export const CommandView: Component = () => {
       prevScrollY = highlightedElementY;
 
       if (
-        (highlightedElementY <= prevY || highlightedElementY <= searchHeight) &&
+        (highlightedElementY <= prevY || highlightedElementY <= headerHeight) &&
         highlightedElementY < wrapperHeight - footerHeight
       ) {
-        const allCommands = commandSections().flatMap(
-          (commandSection) => commandSection.commands
-        );
-        const isFirstCommand = allCommands[0]?.id === highlightedCommandId;
-
-        if (isFirstCommand) {
+        if (
+          !highlightedElement.previousSibling &&
+          !highlightedElement.parentElement?.previousSibling?.previousSibling
+        ) {
           wrapperRef.scrollTo({ top: 0 });
           return;
         }
 
-        if (highlightedElementY < searchHeight + scrollPadding) {
+        if (highlightedElementY < headerHeight + scrollPadding) {
           if (
             highlightedElement.parentNode?.firstChild === highlightedElement
           ) {
@@ -94,13 +88,13 @@ export const CommandView: Component = () => {
               top:
                 highlightedElementY +
                 scrollY -
-                searchHeight -
+                headerHeight -
                 sectionTitleHeight +
                 scrollPadding,
             });
           } else {
             wrapperRef.scrollTo({
-              top: highlightedElementY + scrollY - searchHeight,
+              top: highlightedElementY + scrollY - headerHeight,
             });
           }
         }
@@ -109,12 +103,10 @@ export const CommandView: Component = () => {
       }
 
       if (highlightedElementY > wrapperHeight - footerHeight) {
-        const allCommands = commandSections().flatMap(
-          (commandSection) => commandSection.commands
-        );
-        const isLastCommand = allCommands.at(-1)?.id === highlightedCommandId;
-
-        if (isLastCommand) {
+        if (
+          !highlightedElement.nextSibling &&
+          !highlightedElement.parentElement?.nextSibling
+        ) {
           wrapperRef.scrollTo({ top: Number.MAX_SAFE_INTEGER });
           return;
         }

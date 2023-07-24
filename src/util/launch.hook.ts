@@ -9,7 +9,7 @@ import {
   SettingsService,
 } from "~/services";
 import { HTTPError, NetworkService } from "~/services/network.service";
-import { commandStore, mouseStore, queryStore, router } from "~/store";
+import { commandStore, mouseStore } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { networkStore } from "~/store/network.store";
 import {
@@ -37,8 +37,6 @@ export const useLaunch = () => {
     setHighlightedCommand,
     commandSections,
   } = commandStore;
-  const { queryRef } = queryStore;
-  const { view } = router;
   const {
     setChatCount,
     setChatCountTTL,

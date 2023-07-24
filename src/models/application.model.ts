@@ -1,3 +1,4 @@
+import { Exclude } from "class-transformer";
 import { __macos__, __windows__ } from "~/constants";
 import { InvokeService } from "~/services";
 import { Command, CommandType } from "./command.model";
@@ -17,6 +18,8 @@ export class Application implements ApplicationData {
   icon: string;
   path: string;
   selectedText?: string;
+
+  @Exclude()
   focusedText?: string;
 
   constructor(data: ApplicationData) {

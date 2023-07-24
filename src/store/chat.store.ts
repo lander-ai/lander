@@ -32,6 +32,13 @@ export const chatStore = createRoot(() => {
     Number(localStorage.getItem("chat_plugin_limit") || 50)
   );
   const [isPluginsPanelVisible, setIsPluginsPanelVisible] = createSignal(false);
+  const [archive, setArchive] = createSignal<Thread[]>([]);
+  const [isArchiveVisible, setIsArchiveVisible] = createSignal(false);
+  const [archiveSearchResults, setArchiveSearchResults] =
+    createSignal<Array<{ thread: Thread; message: ThreadMessage }>>();
+  const [highlightedArchiveTile, setHighlightedArchiveTile] = createSignal<
+    Thread | { thread: Thread; message: ThreadMessage }
+  >();
   const [selectedPlugins, setSelectedPlugins] = createSignal(new Plugins());
 
   return {
@@ -55,6 +62,14 @@ export const chatStore = createRoot(() => {
     setChatPluginLimit,
     isPluginsPanelVisible,
     setIsPluginsPanelVisible,
+    archive,
+    setArchive,
+    isArchiveVisible,
+    setIsArchiveVisible,
+    archiveSearchResults,
+    setArchiveSearchResults,
+    highlightedArchiveTile,
+    setHighlightedArchiveTile,
     selectedPlugins,
     setSelectedPlugins,
   };
