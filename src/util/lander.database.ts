@@ -16,7 +16,7 @@ export class LanderDatabase extends Dexie {
 
     this.version(2).stores({
       event: "id++, created_at, type, event",
-      thread: "id, created_at, type, messages, command",
+      thread: "id, created_at, updated_at, type, messages, command",
     });
   }
 }

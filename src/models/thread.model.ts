@@ -26,6 +26,9 @@ export class ThreadMessage {
   @Expose({ name: "created_at", groups: ["local"] })
   createdAt = new Date();
 
+  @Expose({ name: "updated_at", groups: ["local"] })
+  updatedAt = new Date();
+
   @Exclude()
   plugins?: ThreadMessagePlugin[];
 
@@ -50,6 +53,9 @@ export class Thread {
 
   @Expose({ name: "created_at", groups: ["local"] })
   createdAt = new Date();
+
+  @Expose({ name: "updated_at", groups: ["local"] })
+  updatedAt = new Date();
 
   constructor(opts: {
     id?: string;

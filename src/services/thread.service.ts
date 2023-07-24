@@ -8,7 +8,7 @@ export class ThreadService {
   private db = LanderDatabase.shared.thread;
 
   async getAll() {
-    const data = await this.db.toArray();
+    const data = await this.db.orderBy("updated_at").reverse().toArray();
 
     return data.map((thread) => {
       thread.messages = thread.messages.map(
@@ -22,6 +22,7 @@ export class ThreadService {
     const thread = {
       ...(instanceToPlain(data, { groups: ["local"] }) as Thread),
       created_at: data.createdAt,
+      updated_at: new Date(),
     };
 
     const existingThread = await this.db.get({ id: data.id });
