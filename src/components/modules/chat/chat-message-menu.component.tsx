@@ -2,9 +2,11 @@ import { Component, createMemo, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { border, BorderProps, space, SpaceProps } from "styled-system";
 import { Icon, Shortcut, Text, Tooltip } from "~/components/atoms";
-import { ThreadMessage } from "~/models";
+import { Thread, ThreadMessage, ThreadMessageAuthor } from "~/models";
 import { InvokeService } from "~/services";
 import { commandStore, shortcutStore } from "~/store";
+import { chatStore } from "~/store/chat.store";
+import { retryLander } from "~/util";
 
 const STooltipWrapper = styled("div")`
   position: relative;
@@ -61,6 +63,7 @@ interface Props {
 export const ChatMessageMenu: Component<Props> = (props) => {
   const { isShortcutsVisible } = shortcutStore;
   const { focusedApplication } = commandStore;
+  const { thread, setThread } = chatStore;
 
   const [isCopied, setIsCopied] = createSignal(false);
 
@@ -73,6 +76,24 @@ export const ChatMessageMenu: Component<Props> = (props) => {
       !focusedApplication()?.selectedText ||
       focusedApplication()?.focusedText === null
   );
+
+  const handleRegenerateResponse = async () => {
+    const nextThread = thread();
+
+    if (!nextThread) {
+      return;
+    }
+
+    const messageIndex = nextThread.messages.findIndex(
+      (message) => message.id === props.message.id
+    );
+
+    if (messageIndex > -1) {
+      nextThread.messages = nextThread.messages.slice(0, messageIndex);
+      setThread(new Thread(nextThread));
+      retryLander(nextThread);
+    }
+  };
 
   const handleCopy = () => {
     InvokeService.shared.copyText(props.message.content);
@@ -99,14 +120,40 @@ export const ChatMessageMenu: Component<Props> = (props) => {
     <>
       <Show when={!isShortcutsVisible()}>
         <STooltipWrapper>
+          <Show when={props.message.author === ThreadMessageAuthor.AI}>
+            <Tooltip message="Regenerate">
+              <SIcon
+                size="20px"
+                name="refresh"
+                p="6px"
+                pl="8px"
+                borderTopLeftRadius="8px"
+                borderBottomLeftRadius="8px"
+                onClick={handleRegenerateResponse}
+              />
+            </Tooltip>
+          </Show>
+
           <Tooltip message={isCopied() ? "Copied" : "Copy"}>
             <SIcon
               size="20px"
               name="document-clean"
-              pl="8px"
               p="6px"
-              borderTopLeftRadius="8px"
-              borderBottomLeftRadius="8px"
+              pl={
+                props.message.author !== ThreadMessageAuthor.AI
+                  ? "8px"
+                  : undefined
+              }
+              borderTopLeftRadius={
+                props.message.author !== ThreadMessageAuthor.AI
+                  ? "8px"
+                  : undefined
+              }
+              borderBottomLeftRadius={
+                props.message.author !== ThreadMessageAuthor.AI
+                  ? "8px"
+                  : undefined
+              }
               onClick={handleCopy}
             />
           </Tooltip>
@@ -138,6 +185,16 @@ export const ChatMessageMenu: Component<Props> = (props) => {
 
       <Show when={isShortcutsVisible()}>
         <SShortcutsWrapper>
+          <Show when={props.message.author === ThreadMessageAuthor.AI}>
+            <Text.Caption>
+              <Shortcut
+                text="Regenerate"
+                shortcutIndex={0}
+                onTriggered={handleRegenerateResponse}
+              />
+            </Text.Caption>
+          </Show>
+
           <Text.Caption>
             <Shortcut
               text={isCopied() ? "Copied" : "Copy"}
@@ -159,7 +216,7 @@ export const ChatMessageMenu: Component<Props> = (props) => {
           <Text.Caption color={!isReplaceDisabled() ? "text" : "gray"}>
             <Shortcut
               text="Replace"
-              shortcutIndex={0}
+              shortcutIndex={1}
               onTriggered={handleReplace}
               event="keyup"
               disabled={isReplaceDisabled()}
