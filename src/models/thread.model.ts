@@ -1,6 +1,7 @@
-import { Exclude, instanceToPlain } from "class-transformer";
+import { Exclude, Expose, instanceToPlain } from "class-transformer";
 import { Plugin } from "~/cortex";
 import { NetworkRequest } from "~/services/network.service";
+import { Command } from "./command.model";
 
 export enum ThreadMessageAuthor {
   User = "User",
@@ -22,6 +23,9 @@ export class ThreadMessage {
   author: ThreadMessageAuthor;
   content: string;
 
+  @Expose({ name: "created_at", groups: ["local"] })
+  createdAt = new Date();
+
   @Exclude()
   plugins?: ThreadMessagePlugin[];
 
@@ -41,19 +45,27 @@ export class Thread {
   type: ThreadType;
   messages: ThreadMessage[];
 
+  @Expose({ groups: ["local"] })
+  command?: Command;
+
+  @Expose({ name: "created_at", groups: ["local"] })
+  createdAt = new Date();
+
   constructor(opts: {
     id?: string;
     type: ThreadType;
     messages: ThreadMessage[];
+    command?: Command;
   }) {
     this.id = opts.id || this.id;
     this.type = opts.type;
     this.messages = opts.messages;
+    this.command = opts.command;
   }
 
   static requests = {
     chat(thread: Thread) {
-      const dto = instanceToPlain(thread);
+      const dto = instanceToPlain(thread, { groups: ["stream"] });
       return new NetworkRequest("/chat", "POST", dto.thread || dto);
     },
   };

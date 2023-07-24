@@ -28,6 +28,7 @@ const SWrapper = styled("div")`
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
 `;
 
 const SContentWrapper = styled("div")`

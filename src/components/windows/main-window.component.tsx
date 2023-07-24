@@ -1,6 +1,7 @@
-import { Component } from "solid-js";
+import { Component, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import {
+  ChatArchiveView,
   ChatPluginPanel,
   ChatView,
   CommandView,
@@ -47,7 +48,7 @@ const SContentWrapper = styled("div")<{ view: View }>`
 export const MainWindow: Component = () => {
   const { themeMode } = themeStore;
   const { view } = router;
-  const { isPluginsPanelVisible } = chatStore;
+  const { isPluginsPanelVisible, isArchiveVisible } = chatStore;
 
   useKeystrokeHandler();
 
@@ -57,7 +58,12 @@ export const MainWindow: Component = () => {
     <SWrapper themeMode={themeMode()}>
       <Header />
       <SContentWrapper view={view()}>
-        <ChatView />
+        <Show when={!isArchiveVisible()}>
+          <ChatView />
+        </Show>
+        <Show when={isArchiveVisible()}>
+          <ChatArchiveView />
+        </Show>
         <CommandView />
       </SContentWrapper>
       <Footer />

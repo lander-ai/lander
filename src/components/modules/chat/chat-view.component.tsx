@@ -5,6 +5,7 @@ import {
   createSignal,
   For,
   onCleanup,
+  onMount,
   Show,
 } from "solid-js";
 import { styled } from "solid-styled-components";
@@ -33,7 +34,12 @@ const SWrapper = styled("div")`
 
 const SLimitWrapper = styled("div")`
   margin: 16px;
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: space-between;
 `;
+
+let isScrollBlocked = false;
 
 export const ChatView: Component = () => {
   const user = useUser();
@@ -58,6 +64,10 @@ export const ChatView: Component = () => {
   } = chatStore;
 
   const [isAutoScroll, setIsAutoScroll] = createSignal(true);
+
+  onMount(() => {
+    isScrollBlocked = false;
+  });
 
   let wrapperRef: HTMLDivElement | undefined;
 
@@ -91,7 +101,7 @@ export const ChatView: Component = () => {
       return t.messages.slice(1);
     }
 
-    if (selectedCommand()?.id === chatCommand.id) {
+    if (thread()?.command?.id === chatCommand.id) {
       return [...t.messages];
     }
 
@@ -162,7 +172,7 @@ export const ChatView: Component = () => {
   });
 
   createEffect(() => {
-    if (isMouseActive()) {
+    if (isScrollBlocked) {
       return;
     }
 
@@ -211,6 +221,8 @@ export const ChatView: Component = () => {
         });
       }
     }
+
+    isScrollBlocked = isMouseActive();
   });
 
   const chatCountText = createMemo(() => {
@@ -273,22 +285,25 @@ export const ChatView: Component = () => {
     >
       <Show when={!user.data?.subscription || selectedPlugins().size}>
         <SLimitWrapper>
-          <Show when={user.data?.subscription}>
-            <Text.Callout fontWeight="medium">Plugins</Text.Callout>
-          </Show>
+          <div>
+            <Show when={user.data?.subscription}>
+              <Text.Callout fontWeight="medium">Plugins</Text.Callout>
+            </Show>
 
-          <Text.Callout color="gray">{chatCountText()}</Text.Callout>
+            <Text.Callout color="gray">{chatCountText()}</Text.Callout>
 
-          <Show when={chatCountUsageResetText()} keyed>
-            {(chatCountUsageResetText) => (
-              <Text.Callout color="gray">
-                {chatCountUsageResetText}
-              </Text.Callout>
-            )}
-          </Show>
+            <Show when={chatCountUsageResetText()} keyed>
+              {(chatCountUsageResetText) => (
+                <Text.Callout color="gray">
+                  {chatCountUsageResetText}
+                </Text.Callout>
+              )}
+            </Show>
+          </div>
 
           <Show when={!user.data?.subscription}>
             <Link
+              mr="2px"
               mt="4px"
               onClick={() =>
                 InvokeService.shared.openSettingsWindow(SettingsView.Account)
@@ -300,7 +315,7 @@ export const ChatView: Component = () => {
         </SLimitWrapper>
       </Show>
 
-      <Show when={selectedCommand()} keyed>
+      <Show when={thread()?.command || selectedCommand()} keyed>
         {(command) => <ChatCommand command={command} />}
       </Show>
 

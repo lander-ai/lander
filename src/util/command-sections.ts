@@ -1,7 +1,12 @@
 import { Application, Command, CommandSection, CommandType } from "~/models";
 import { AnalyticsService, InvokeService } from "~/services";
 import { networkStore } from "~/store/network.store";
-import { aiCommands, chatCommand, getCustomCommand } from "./ai-commands";
+import {
+  aiCommands,
+  chatArchiveCommand,
+  chatCommand,
+  getCustomCommand,
+} from "./ai-commands";
 import { landerCommands } from "./lander-commands";
 
 // TODO: Add better types
@@ -112,6 +117,7 @@ export const getCommandSections = async () => {
   const applicationCommands = await getCommandSection(CommandType.Application);
 
   const suggestedCommands = await getSuggestionsCommandSection([
+    ...(aiCommands?.commands || []),
     ...(applicationCommands?.commands || []),
   ]);
 
