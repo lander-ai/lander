@@ -200,9 +200,11 @@ export const useKeystrokeHandler = () => {
         if (view() === View.Command) {
           highlightedCommand()?.onClick();
 
-          setTimeout(() => {
-            setQuery("");
-          }, 400);
+          if (highlightedCommand()?.id !== "lander-close") {
+            setTimeout(() => {
+              setQuery("");
+            }, 400);
+          }
         }
       }
     };

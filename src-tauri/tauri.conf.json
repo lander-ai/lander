@@ -27,7 +27,8 @@
         "assetScope": ["$APPDATA/**/*"]
       },
       "process": {
-        "relaunch": true
+        "relaunch": true,
+        "exit": true
       },
       "shell": {
         "open": true,

@@ -53,11 +53,13 @@ export const CommandTile: Component<Props> = (props) => {
   };
 
   const handlePress = () => {
-    setTimeout(() => {
-      setQuery("");
-    }, 400);
-
     props.command.onClick();
+
+    if (props.command.id !== "lander-close") {
+      setTimeout(() => {
+        setQuery("");
+      }, 400);
+    }
   };
 
   return (
