@@ -283,7 +283,7 @@ export const FooterChat: Component = () => {
 
       <Show when={!isArchiveVisible()}>
         <SChatButtonsWrapper>
-          <Show when={user.data?.subscription || true}>
+          <Show when={user.data?.subscription}>
             <Button
               py="2px"
               onClick={handleTogglePlugins}
