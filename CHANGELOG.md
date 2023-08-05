@@ -1,5 +1,22 @@
 
 
+## [0.0.1-preview.8](https://github.com/lander-ai/lander/compare/v0.0.1-preview.7...v0.0.1-preview.8) (2023-08-05)
+
+
+### Bug Fixes
+
+* hide plugins for core users ([9edce8e](https://github.com/lander-ai/lander/commit/9edce8e7735eb5d2c668c9455b5311f144cd84b3))
+* macos support multiple monitors ([292941c](https://github.com/lander-ai/lander/commit/292941c97220aff1bc274d71cc1d8a655d950c14))
+* sort archive by updated_at ([922534b](https://github.com/lander-ai/lander/commit/922534bd468fbc763e8b7840ad33036235773551))
+
+
+### Features
+
+* add calculator ([85eb956](https://github.com/lander-ai/lander/commit/85eb956325666ac20674b29d4e6f47b53f533b87))
+* add chat archive ([1bdd8d1](https://github.com/lander-ai/lander/commit/1bdd8d146b00701ac347344db8e1dbc854e1cc28))
+* add close button ([9cbe2f7](https://github.com/lander-ai/lander/commit/9cbe2f79e3c367713d0e4373c48693f03218c722))
+* add regenerate response ([1288023](https://github.com/lander-ai/lander/commit/1288023498d04ed5327383b12f3b56ce1cfde04b))
+
 ## [0.0.1-preview.7](https://github.com/lander-ai/lander/compare/v0.0.1-preview.6...v0.0.1-preview.7) (2023-07-17)
 
 
