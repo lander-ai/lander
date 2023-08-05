@@ -1,4 +1,5 @@
 import { createRoot, createSignal } from "solid-js";
+import { CalculatorResult } from "~/calculator/types";
 import { Application, Command, CommandSection, CommandType } from "~/models";
 
 export const commandStore = createRoot(() => {
@@ -10,6 +11,8 @@ export const commandStore = createRoot(() => {
     createSignal<Application>();
   const [highlightedCommand, setHighlightedCommand] = createSignal<Command>();
   const [selectedCommand, setSelectedCommand] = createSignal<Command>();
+  const [calculationResult, setCalculationResult] =
+    createSignal<CalculatorResult>();
 
   const setCommandSections = (next: CommandSection[]) => {
     mutateCommandSections(next);
@@ -56,5 +59,7 @@ export const commandStore = createRoot(() => {
     setHighlightedCommand,
     selectedCommand,
     setSelectedCommand,
+    calculationResult,
+    setCalculationResult,
   };
 });

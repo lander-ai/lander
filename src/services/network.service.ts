@@ -129,8 +129,6 @@ export class NetworkService {
       response.data as Record<string, unknown>
     );
 
-    // TODO: get this to work with arrays
-
     const cls = new (model as ClassType)({}) as ClassType;
 
     Object.assign(cls, parsedResponse);

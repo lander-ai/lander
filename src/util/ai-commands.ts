@@ -23,6 +23,7 @@ const handleChat = async (command: Command, prompt: string) => {
     id: crypto.randomUUID(),
     type: ThreadType.Chat,
     messages: [],
+    command,
   });
 
   askLander(`${prompt}${selectedText}`, thread);
@@ -38,19 +39,20 @@ export const chatCommand = new Command({
   type: CommandType.AI,
   title: "Chat with AI",
   icon,
-  suggestable: false,
   onClick() {
     const { navigate } = router;
-    const { setThread } = chatStore;
+    const { setThread, setIsArchiveVisible } = chatStore;
     const { setSelectedCommand } = commandStore;
 
     const thread = new Thread({
+      command: new Command(this),
       id: crypto.randomUUID(),
       type: ThreadType.Chat,
       messages: [],
     });
 
     batch(() => {
+      setIsArchiveVisible(false);
       setSelectedCommand(new Command(this));
       setThread(new Thread(thread));
       navigate(View.Chat);

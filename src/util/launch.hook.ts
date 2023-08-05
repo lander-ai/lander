@@ -1,5 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 import { batch, onMount } from "solid-js";
+import { calculator } from "~/calculator";
 import { CommandType, User } from "~/models";
 import { useUser } from "~/queries";
 import {
@@ -9,7 +10,7 @@ import {
   SettingsService,
 } from "~/services";
 import { HTTPError, NetworkService } from "~/services/network.service";
-import { commandStore, mouseStore, queryStore, router } from "~/store";
+import { commandStore, mouseStore } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { networkStore } from "~/store/network.store";
 import {
@@ -17,6 +18,8 @@ import {
   getCommandSections,
   getSuggestionsCommandSection,
 } from "./command-sections";
+
+let lastCurrencyRefresh: Date | undefined = undefined;
 
 const installedApplicationsEvent = new EventService(
   EventKey.InstalledApplications,
@@ -37,8 +40,6 @@ export const useLaunch = () => {
     setHighlightedCommand,
     commandSections,
   } = commandStore;
-  const { queryRef } = queryStore;
-  const { view } = router;
   const {
     setChatCount,
     setChatCountTTL,
@@ -87,6 +88,8 @@ export const useLaunch = () => {
 
   onMount(async () => {
     setIsOffline(!(await authenticate()));
+
+    await calculator.refreshCurrencyData();
 
     NetworkService.shared.addListener("stream", (response) => {
       const {
@@ -195,6 +198,16 @@ export const useLaunch = () => {
 
       setTimeout(async () => {
         setIsOffline(!(await authenticate()));
+      });
+
+      setTimeout(async () => {
+        if (
+          !lastCurrencyRefresh ||
+          Number(new Date()) - Number(lastCurrencyRefresh) > 60 * 60 * 1000
+        ) {
+          await calculator.refreshCurrencyData();
+          lastCurrencyRefresh = new Date();
+        }
       });
     });
 

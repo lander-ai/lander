@@ -12,6 +12,10 @@
   },
   "tauri": {
     "allowlist": {
+      "clipboard": {
+        "writeText": true,
+        "readText": true
+      },
       "fs": {
         "scope": ["$RESOURCE/*"]
       },
@@ -27,7 +31,8 @@
         "assetScope": ["$APPDATA/**/*"]
       },
       "process": {
-        "relaunch": true
+        "relaunch": true,
+        "exit": true
       },
       "shell": {
         "open": true,

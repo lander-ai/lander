@@ -108,7 +108,7 @@ export class Prompt {
   }
 
   toDTO() {
-    const dto = instanceToPlain(this.threadMessages);
+    const dto = instanceToPlain(this.threadMessages, { groups: ["stream"] });
     return dto;
   }
 }

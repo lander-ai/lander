@@ -27,7 +27,7 @@ const SContentWrapper = styled("div")<{ visible: boolean }>`
   background: ${(props) => props.theme?.colors.gray6};
   border-left: 1px solid ${(props) => props.theme?.colors.gray4};
   right: ${(props) => (props.visible ? 0 : "-100%")};
-  transition: 0.4s right ease-out;
+  transition: 0.3s right ease-out;
   padding: 8px 16px;
   pointer-events: all;
 `;

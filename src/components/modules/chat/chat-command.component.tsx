@@ -64,12 +64,12 @@ interface Props {
 
 export const ChatCommand: Component<Props> = (props) => {
   const { thread, contextualText, setContextualText } = chatStore;
-  const { focusedApplication, selectedCommand } = commandStore;
+  const { focusedApplication } = commandStore;
 
   const [isSelectedTextVisible, setIsSelectedTextVisible] = createSignal(false);
 
   const contextualTextLayout = createMemo(() => {
-    const command = selectedCommand();
+    const command = thread()?.command;
     const application = command?.application;
     const context = contextualText();
 

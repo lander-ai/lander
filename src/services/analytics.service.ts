@@ -1,32 +1,5 @@
-import Dexie, { Table } from "dexie";
-
-export enum AnalyticsEventType {
-  Interaction = "interaction",
-  Command = "command",
-}
-
-interface BaseAnalyticsEventPayload {
-  name: string;
-}
-
-interface AnalyticsCommandEventPayload {
-  command: {
-    id: string;
-    name: string;
-  };
-}
-
-type AnalyticsEventPayload<EventType extends AnalyticsEventType> =
-  BaseAnalyticsEventPayload &
-    (EventType extends AnalyticsEventType.Command
-      ? AnalyticsCommandEventPayload
-      : never);
-
-export interface AnalyticsEvent<EventType extends AnalyticsEventType> {
-  created_at: Date;
-  type: EventType;
-  event: AnalyticsEventPayload<EventType>;
-}
+import { AnalyticsEvent, AnalyticsEventType } from "~/models";
+import { LanderDatabase } from "~/util/lander.database";
 
 export interface AnalyticsAggregationEvent<EventType extends AnalyticsEventType>
   extends AnalyticsEvent<EventType> {
@@ -35,22 +8,10 @@ export interface AnalyticsAggregationEvent<EventType extends AnalyticsEventType>
 
 type AddEventPayload = Omit<AnalyticsEvent<AnalyticsEventType>, "created_at">;
 
-class AnalyticsDatabase extends Dexie {
-  public event!: Table<AnalyticsEvent<AnalyticsEventType>, number>;
-
-  constructor() {
-    super("lander");
-
-    this.version(1).stores({
-      event: "id++, created_at, type, event",
-    });
-  }
-}
-
 export class AnalyticsService {
   static shared = new AnalyticsService();
 
-  private db = new AnalyticsDatabase().event;
+  private db = LanderDatabase.shared.event;
 
   async addEvent(data: AddEventPayload) {
     const now = new Date();

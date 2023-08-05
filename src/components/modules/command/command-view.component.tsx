@@ -1,6 +1,7 @@
-import { Component, createEffect, Match, Switch } from "solid-js";
+import { Component, createEffect, Match, Show, Switch } from "solid-js";
 import { styled } from "solid-styled-components";
-import { commandStore, router, View } from "~/store";
+import { commandStore, queryStore, router, View } from "~/store";
+import { CommandCalculationResult } from "./command-calculation-result.component";
 import { CommandOverview } from "./command-overview.component";
 import { CommandSearchView } from "./command-search-view.component";
 
@@ -16,11 +17,12 @@ const SWrapper = styled("div")`
 
 export const CommandView: Component = () => {
   const { view } = router;
+  const { query } = queryStore;
   const {
     searchResults,
     highlightedCommand,
     setHighlightedCommand,
-    commandSections,
+    calculationResult,
   } = commandStore;
 
   let wrapperRef: HTMLDivElement | undefined;
@@ -55,7 +57,7 @@ export const CommandView: Component = () => {
       }
 
       const footerHeight = 36;
-      const searchHeight = 50;
+      const headerHeight = 50;
       const scrollPadding = 12;
       const commmandTileHeight = highlightedElementHeight;
       const prevY = prevScrollY;
@@ -63,20 +65,18 @@ export const CommandView: Component = () => {
       prevScrollY = highlightedElementY;
 
       if (
-        (highlightedElementY <= prevY || highlightedElementY <= searchHeight) &&
+        (highlightedElementY <= prevY || highlightedElementY <= headerHeight) &&
         highlightedElementY < wrapperHeight - footerHeight
       ) {
-        const allCommands = commandSections().flatMap(
-          (commandSection) => commandSection.commands
-        );
-        const isFirstCommand = allCommands[0]?.id === highlightedCommandId;
-
-        if (isFirstCommand) {
+        if (
+          !highlightedElement.previousSibling &&
+          !highlightedElement.parentElement?.previousSibling?.previousSibling
+        ) {
           wrapperRef.scrollTo({ top: 0 });
           return;
         }
 
-        if (highlightedElementY < searchHeight + scrollPadding) {
+        if (highlightedElementY < headerHeight + scrollPadding) {
           if (
             highlightedElement.parentNode?.firstChild === highlightedElement
           ) {
@@ -94,13 +94,13 @@ export const CommandView: Component = () => {
               top:
                 highlightedElementY +
                 scrollY -
-                searchHeight -
+                headerHeight -
                 sectionTitleHeight +
                 scrollPadding,
             });
           } else {
             wrapperRef.scrollTo({
-              top: highlightedElementY + scrollY - searchHeight,
+              top: highlightedElementY + scrollY - headerHeight,
             });
           }
         }
@@ -109,12 +109,10 @@ export const CommandView: Component = () => {
       }
 
       if (highlightedElementY > wrapperHeight - footerHeight) {
-        const allCommands = commandSections().flatMap(
-          (commandSection) => commandSection.commands
-        );
-        const isLastCommand = allCommands.at(-1)?.id === highlightedCommandId;
-
-        if (isLastCommand) {
+        if (
+          !highlightedElement.nextSibling &&
+          !highlightedElement.parentElement?.nextSibling
+        ) {
           wrapperRef.scrollTo({ top: Number.MAX_SAFE_INTEGER });
           return;
         }
@@ -139,6 +137,13 @@ export const CommandView: Component = () => {
 
   return (
     <SWrapper ref={wrapperRef}>
+      <Show when={!!query() && calculationResult() !== undefined}>
+        <CommandCalculationResult
+          query={query()}
+          calculation={calculationResult()!}
+        />
+      </Show>
+
       <Switch fallback={<CommandOverview />}>
         <Match when={searchResults().length}>
           <CommandSearchView />

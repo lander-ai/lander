@@ -1,11 +1,13 @@
-import { AnalyticsEventType, AnalyticsService } from "~/services";
+import { Exclude } from "class-transformer";
+import { AnalyticsService } from "~/services";
+import { AnalyticsEventType } from "./analytics-event.model";
 import { Application } from "./application.model";
 
 export enum CommandType {
-  AI,
-  Application,
-  Suggestion,
-  Lander,
+  AI = "ai",
+  Application = "application",
+  Suggestion = "suggestion",
+  Lander = "lander",
 }
 
 export class Command {
@@ -15,8 +17,14 @@ export class Command {
   icon: string;
   subtitle?: string;
   application?: Application;
+
+  @Exclude()
   searchable = true;
+
+  @Exclude()
   suggestable = true;
+
+  @Exclude()
   onClickMethod: () => void;
 
   constructor(opts: {

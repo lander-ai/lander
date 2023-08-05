@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { Application, Command, CommandSection, CommandType } from "~/models";
 import { AnalyticsService, InvokeService } from "~/services";
 import { networkStore } from "~/store/network.store";
@@ -66,14 +67,9 @@ export const getCommandSection = async (
 };
 
 export const getSuggestionsCommandSection = async (commands: Command[]) => {
-  const now = new Date();
-
-  const lastMonth = new Date();
-  lastMonth.setDate(now.getMonth() - 1);
-
   const commandEvents = await AnalyticsService.shared.aggregateCommandEvents(
-    lastMonth,
-    now
+    dayjs().subtract(1, "month").toDate(),
+    new Date()
   );
 
   const suggestedCommands = commandEvents
@@ -112,6 +108,7 @@ export const getCommandSections = async () => {
   const applicationCommands = await getCommandSection(CommandType.Application);
 
   const suggestedCommands = await getSuggestionsCommandSection([
+    ...(aiCommands?.commands || []),
     ...(applicationCommands?.commands || []),
   ]);
 

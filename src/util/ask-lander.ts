@@ -8,7 +8,13 @@ import {
   ThreadMessagePlugin,
 } from "~/models";
 import { NetworkService } from "~/services/network.service";
+import { ThreadService } from "~/services/thread.service";
 import { chatStore } from "~/store/chat.store";
+import { chatCommand } from "./ai-commands";
+
+export const startNewChat = () => {
+  chatCommand.onClickMethod();
+};
 
 export const retryLander = async (thread: Thread) => {
   askLander(undefined, thread);
@@ -84,6 +90,14 @@ export const askLander = async (input: string | undefined, thread: Thread) => {
     });
     thread.messages[messageIndex].plugins = [...messagePlugins];
     setThread(new Thread(thread));
+  });
+
+  chat.on("end", () => {
+    const next = chatStore.thread();
+
+    if (next) {
+      ThreadService.shared.upsertThread(next);
+    }
   });
 
   chat.call(message || thread.messages[thread.messages.length - 2].content);

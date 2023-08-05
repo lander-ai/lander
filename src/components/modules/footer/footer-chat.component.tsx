@@ -1,6 +1,8 @@
-import { Component, createEffect, onCleanup, Show } from "solid-js";
+import Fuse from "fuse.js";
+import { batch, Component, createEffect, on, onCleanup, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { Icon } from "~/components/atoms";
+import { Button, Icon } from "~/components/atoms";
+import { useArchive, useUser } from "~/queries";
 import { NetworkService } from "~/services/network.service";
 import { router, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
@@ -13,6 +15,7 @@ const SWrapper = styled("div")`
   gap: 16px;
   padding: 8px 16px;
   align-items: center;
+  min-height: 27px;
 `;
 
 const SChatInput = styled("div")<{ placeholder: string }>`
@@ -47,6 +50,13 @@ const SChatInput = styled("div")<{ placeholder: string }>`
   }
 `;
 
+const SChatButtonsWrapper = styled("div")`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 12px;
+`;
+
 const SButtonIcon = styled(Icon)`
   align-self: end;
   padding: 4px;
@@ -59,10 +69,51 @@ const SButtonIcon = styled(Icon)`
   }
 `;
 
+const drafts: { chat: string | undefined } = {
+  chat: undefined,
+};
+
 export const FooterChat: Component = () => {
   const { view } = router;
-  const { thread, contextualText } = chatStore;
+  const {
+    thread,
+    contextualText,
+    isArchiveVisible,
+    setArchiveSearchResults,
+    setHighlightedArchiveTile,
+    setIsPluginsPanelVisible,
+    selectedPlugins,
+    setHighlightedMessage,
+  } = chatStore;
   const { isStreaming } = networkStore;
+
+  const user = useUser();
+
+  const archive = useArchive();
+
+  createEffect(() => {
+    if (isArchiveVisible()) {
+      archive.refetch();
+    }
+  });
+
+  const handleTogglePlugins = () => {
+    if (view() === View.Chat) {
+      setIsPluginsPanelVisible((prev) => !prev);
+    }
+  };
+
+  const fuse = () =>
+    new Fuse(
+      archive.data?.flatMap((thread) =>
+        thread.messages.map((message) => ({ message, thread }))
+      ) || [],
+      {
+        keys: ["message.content"],
+        threshold: 0.2,
+        ignoreLocation: true,
+      }
+    );
 
   let ref: HTMLDivElement | undefined;
 
@@ -106,12 +157,40 @@ export const FooterChat: Component = () => {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (!event.shiftKey && event.key === "Enter") {
+    if (isArchiveVisible() && event.key === "Enter") {
       event.preventDefault();
+    }
 
+    if (!isArchiveVisible() && !event.shiftKey && event.key === "Enter") {
+      event.preventDefault();
       handleSubmit();
     }
   };
+
+  createEffect(() => {
+    if (!ref) {
+      return;
+    }
+
+    if (isArchiveVisible()) {
+      drafts.chat = ref?.innerText;
+    }
+
+    let next: string | undefined;
+
+    if (!isArchiveVisible() && drafts.chat) {
+      next = drafts.chat;
+    }
+
+    if (next) {
+      const el = document.createElement("div");
+      el.innerText = next;
+      ref.replaceChildren(el);
+    } else {
+      setArchiveSearchResults(undefined);
+      ref.replaceChildren();
+    }
+  });
 
   const handleInput = (event: InputEvent) => {
     if (!ref) {
@@ -131,6 +210,24 @@ export const FooterChat: Component = () => {
       ref.replaceChildren(el);
 
       moveCursorToEnd();
+    }
+
+    if (isArchiveVisible()) {
+      setHighlightedMessage(undefined);
+
+      const query = ref.innerText.trim() ?? "";
+
+      if (!query) {
+        setArchiveSearchResults(undefined);
+        return;
+      }
+
+      const results = fuse().search(ref.innerText.trim() ?? "");
+
+      batch(() => {
+        setArchiveSearchResults(results.map((result) => result.item));
+        setHighlightedArchiveTile(results[0]?.item);
+      });
     }
   };
 
@@ -172,7 +269,9 @@ export const FooterChat: Component = () => {
     <SWrapper>
       <SChatInput
         placeholder={
-          contextualText()
+          isArchiveVisible()
+            ? "Search archive"
+            : contextualText()
             ? `Ask from ${contextualText()?.provider}`
             : "Ask me anything"
         }
@@ -182,12 +281,27 @@ export const FooterChat: Component = () => {
         contentEditable
       />
 
-      <Show when={isStreaming()}>
-        <SButtonIcon onClick={handleCancel} name="cross" size="18px" />
-      </Show>
+      <Show when={!isArchiveVisible()}>
+        <SChatButtonsWrapper>
+          <Show when={user.data?.subscription}>
+            <Button
+              py="2px"
+              onClick={handleTogglePlugins}
+              shortcutIndex={0}
+              selected={!!selectedPlugins().size}
+            >
+              Plugins
+            </Button>
+          </Show>
 
-      <Show when={!isStreaming()}>
-        <SButtonIcon onClick={handleSubmit} name="send-2" size="18px" />
+          <Show when={isStreaming()}>
+            <SButtonIcon onClick={handleCancel} name="cross" size="18px" />
+          </Show>
+
+          <Show when={!isStreaming()}>
+            <SButtonIcon onClick={handleSubmit} name="send-2" size="18px" />
+          </Show>
+        </SChatButtonsWrapper>
       </Show>
     </SWrapper>
   );

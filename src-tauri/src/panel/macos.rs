@@ -2,7 +2,10 @@ use objc_id::ShareId;
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager, Window, Wry};
 
+mod monitor;
 mod ns_panel;
+
+use monitor::position_panel;
 
 #[derive(Default)]
 pub struct Store {
@@ -28,6 +31,7 @@ pub fn init_panel(app_handle: AppHandle<Wry>, window: Window<Wry>) {
 }
 
 pub fn show_panel(app_handle: AppHandle<Wry>) {
+    position_panel(&app_handle.clone().get_window("main").unwrap());
     get_panel(app_handle).show();
 }
 
