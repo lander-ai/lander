@@ -1,6 +1,7 @@
-import { Component, createEffect, Match, Switch } from "solid-js";
+import { Component, createEffect, Match, Show, Switch } from "solid-js";
 import { styled } from "solid-styled-components";
-import { commandStore, router, View } from "~/store";
+import { commandStore, queryStore, router, View } from "~/store";
+import { CommandCalculationResult } from "./command-calculation-result.component";
 import { CommandOverview } from "./command-overview.component";
 import { CommandSearchView } from "./command-search-view.component";
 
@@ -16,8 +17,13 @@ const SWrapper = styled("div")`
 
 export const CommandView: Component = () => {
   const { view } = router;
-  const { searchResults, highlightedCommand, setHighlightedCommand } =
-    commandStore;
+  const { query } = queryStore;
+  const {
+    searchResults,
+    highlightedCommand,
+    setHighlightedCommand,
+    calculationResult,
+  } = commandStore;
 
   let wrapperRef: HTMLDivElement | undefined;
 
@@ -131,6 +137,13 @@ export const CommandView: Component = () => {
 
   return (
     <SWrapper ref={wrapperRef}>
+      <Show when={!!query() && calculationResult() !== undefined}>
+        <CommandCalculationResult
+          query={query()}
+          calculation={calculationResult()!}
+        />
+      </Show>
+
       <Switch fallback={<CommandOverview />}>
         <Match when={searchResults().length}>
           <CommandSearchView />

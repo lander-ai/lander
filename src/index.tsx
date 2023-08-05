@@ -1,7 +1,13 @@
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { render } from "solid-js/web";
 import { App } from "./app.component";
 import "./index.css";
 import "./polyfills";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const root = document.getElementById("root");
 

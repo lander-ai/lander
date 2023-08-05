@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import Fuse from "fuse.js";
 import {
   batch,
@@ -7,6 +8,7 @@ import {
   onCleanup,
 } from "solid-js";
 import { styled } from "solid-styled-components";
+import { calculator } from "~/calculator";
 import { AnalyticsEventType } from "~/models";
 import { AnalyticsAggregationEvent, AnalyticsService } from "~/services";
 import { commandStore, queryStore, router, View } from "~/store";
@@ -15,6 +17,7 @@ const SSearchInput = styled("input")`
   font-family: ${(props) => props.theme?.fontFamily};
   font-size: 18px;
   color: ${(props) => props.theme?.colors.text};
+  font-weight: ${(props) => props.theme?.fontWeights.regular};
   width: 100%;
   background: transparent;
   border: none;
@@ -34,8 +37,12 @@ let commandEvents: AnalyticsAggregationEvent<AnalyticsEventType.Command>[] = [];
 export const HeaderCommand: Component = () => {
   const { view } = router;
   const { query, setQuery, setQueryRef } = queryStore;
-  const { commandSections, setSearchResults, setHighlightedCommand } =
-    commandStore;
+  const {
+    commandSections,
+    setSearchResults,
+    setHighlightedCommand,
+    setCalculationResult,
+  } = commandStore;
 
   const [isQueryDirty, setIsQueryDirty] = createSignal(false);
 
@@ -51,14 +58,9 @@ export const HeaderCommand: Component = () => {
         ref?.select();
       }
 
-      const now = new Date();
-
-      const lastMonth = new Date();
-      lastMonth.setDate(now.getMonth() - 1);
-
       commandEvents = await AnalyticsService.shared.aggregateCommandEvents(
-        lastMonth,
-        now
+        dayjs().subtract(1, "month").toDate(),
+        new Date()
       );
     };
 
@@ -89,10 +91,14 @@ export const HeaderCommand: Component = () => {
       batch(() => {
         setSearchResults([]);
         setHighlightedCommand(commandSections()?.[0]?.commands?.[0]);
+        setCalculationResult(undefined);
       });
 
       return;
     }
+
+    const calculationResult = calculator.evaluate(q);
+    setCalculationResult(calculationResult);
 
     const results = fuse().search(q);
 

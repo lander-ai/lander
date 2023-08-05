@@ -18,6 +18,7 @@
     "@tauri-apps/api": "^1.4.0",
     "@tauri-apps/cli": "^1.4.0",
     "class-transformer": "^0.5.1",
+    "dayjs": "^1.11.9",
     "dexie": "^3.2.4",
     "eslint-plugin-solid": "^0.12.1",
     "fuse.js": "^6.6.2",

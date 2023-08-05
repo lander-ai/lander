@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {
   Component,
   createEffect,
@@ -83,15 +84,9 @@ export const SettingsAccountProfile: Component<Props> = (props) => {
   };
 
   const renewalDate = createMemo(() => {
-    const now = new Date();
-
-    const date = new Date(
+    return dayjs(
       (user.data?.subscription?.billingCycleAnchor || 0) * 1000
-    ).getDate();
-
-    const month = now.getDay() < date ? now.getMonth() : date;
-
-    return `${String(date).padStart(2, "0")}/${String(month).padStart(2, "0")}`;
+    ).format("MMM D YYYY");
   });
 
   return (
@@ -159,9 +154,7 @@ export const SettingsAccountProfile: Component<Props> = (props) => {
                     prompt({
                       title:
                         "Are you sure you want to cancel your subscription?",
-                      body: `Your subscription will be active until ${renewalDate()}/${String(
-                        new Date().getFullYear()
-                      )}. After this date, you account will be downgraded to Core.`,
+                      body: `Your subscription will be active until ${renewalDate()}. After this date, you account will be downgraded to Core.`,
                       successText: "Cancel",
                       cancelText: "Back",
                       async onSuccess() {
@@ -192,9 +185,7 @@ export const SettingsAccountProfile: Component<Props> = (props) => {
                     prompt({
                       title:
                         "Are you sure you want to resume your subscription?",
-                      body: `You will be billed for your subscription on ${renewalDate()}/${String(
-                        new Date().getFullYear()
-                      )}. After this date, your subcription will continue as normal.`,
+                      body: `You will be billed for your subscription on ${renewalDate()}. After this date, your subcription will continue as normal.`,
                       successText: "Resume",
                       cancelText: "Back",
                       async onSuccess() {
