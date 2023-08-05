@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {
   Component,
   createEffect,
@@ -262,9 +263,7 @@ export const ChatView: Component = () => {
       return undefined;
     }
 
-    return `Your usage resets at ${new Date(ttl * 1000).getHours()}:${new Date(
-      ttl * 1000
-    ).getMinutes()}`;
+    return `Your usage resets at ${dayjs(ttl * 1000).format("HH:mm")}`;
   });
 
   createEffect(() => {

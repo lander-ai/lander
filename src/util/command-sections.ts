@@ -1,12 +1,8 @@
+import dayjs from "dayjs";
 import { Application, Command, CommandSection, CommandType } from "~/models";
 import { AnalyticsService, InvokeService } from "~/services";
 import { networkStore } from "~/store/network.store";
-import {
-  aiCommands,
-  chatArchiveCommand,
-  chatCommand,
-  getCustomCommand,
-} from "./ai-commands";
+import { aiCommands, chatCommand, getCustomCommand } from "./ai-commands";
 import { landerCommands } from "./lander-commands";
 
 // TODO: Add better types
@@ -71,14 +67,9 @@ export const getCommandSection = async (
 };
 
 export const getSuggestionsCommandSection = async (commands: Command[]) => {
-  const now = new Date();
-
-  const lastMonth = new Date();
-  lastMonth.setDate(now.getMonth() - 1);
-
   const commandEvents = await AnalyticsService.shared.aggregateCommandEvents(
-    lastMonth,
-    now
+    dayjs().subtract(1, "month").toDate(),
+    new Date()
   );
 
   const suggestedCommands = commandEvents

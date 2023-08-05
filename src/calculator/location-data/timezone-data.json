@@ -1,0 +1,110 @@
+[
+  {
+    "offset": -11,
+    "zones": ["SST"]
+  },
+  {
+    "offset": -10,
+    "zones": ["HST"]
+  },
+  {
+    "offset": -9,
+    "zones": ["AKST"]
+  },
+  {
+    "offset": -8,
+    "zones": ["PST", "AKDT"]
+  },
+  {
+    "offset": -7,
+    "zones": ["MST", "PDT"]
+  },
+  {
+    "offset": -6,
+    "zones": ["CST", "CAST", "MDT"]
+  },
+  {
+    "offset": -5,
+    "zones": ["EST", "SPST", "UEDT", "CDT"]
+  },
+  {
+    "offset": -4,
+    "zones": ["AST", "EDT"]
+  },
+  {
+    "offset": -3.5,
+    "zones": ["NST", "ADT"]
+  },
+  {
+    "offset": -3,
+    "zones": ["ART", "NDT"]
+  },
+  {
+    "offset": -2,
+    "zones": []
+  },
+  {
+    "offset": -1,
+    "zones": ["AZOT"]
+  },
+  {
+    "offset": 0,
+    "zones": ["GMT", "UTC", "GST"]
+  },
+  {
+    "offset": 1,
+    "zones": ["CET", "BST", "GDT"]
+  },
+  {
+    "offset": 2,
+    "zones": ["EET", "CEST"]
+  },
+  {
+    "offset": 3,
+    "zones": ["EAT", "MSK", "EEST"]
+  },
+  {
+    "offset": 4,
+    "zones": []
+  },
+  {
+    "offset": 5,
+    "zones": ["PKT"]
+  },
+  {
+    "offset": 5.5,
+    "zones": ["IST", "SLST"]
+  },
+  {
+    "offset": 6,
+    "zones": ["CAST"]
+  },
+  {
+    "offset": 7,
+    "zones": ["SAST"]
+  },
+  {
+    "offset": 8,
+    "zones": ["NAST", "WAST"]
+  },
+  {
+    "offset": 9,
+    "zones": ["JST", "KST"]
+  },
+  {
+    "offset": 9.5,
+    "zones": ["ACST"]
+  },
+  {
+    "offset": 10,
+    "zones": ["EAST", "AEST"]
+  },
+  {
+    "offset": 11,
+    "zones": ["CPST"]
+  },
+  {
+    "offset": 12,
+    "zones": ["NZST"]
+  }
+]
