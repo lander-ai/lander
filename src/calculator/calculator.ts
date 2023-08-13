@@ -157,7 +157,10 @@ class Calculator {
         : undefined;
 
     if (countryValue) {
-      return new CalculatorCountryToken(countryValue.name, countryValue);
+      const token = new CalculatorCountryToken(countryValue.name, countryValue);
+      token.displayDefault = input.length > 2;
+
+      return token;
     }
 
     const timezoneValue =
