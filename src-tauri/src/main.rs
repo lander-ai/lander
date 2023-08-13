@@ -24,7 +24,7 @@ mod util;
 fn main() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
-            MacosLauncher::LaunchAgent,
+            MacosLauncher::AppleScript,
             None,
         ))
         .plugin(tauri_plugin_store::Builder::default().build())
