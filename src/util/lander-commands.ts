@@ -21,7 +21,7 @@ export const landerCommands = [
   }),
   new Command({
     id: "chat-archive",
-    type: CommandType.AI,
+    type: CommandType.Lander,
     title: "Chat archive",
     subtitle: "See previous conversations",
     suggestable: false,
@@ -38,7 +38,7 @@ export const landerCommands = [
   }),
   new Command({
     id: "lander-close",
-    type: CommandType.AI,
+    type: CommandType.Lander,
     title: "Close Lander",
     icon,
     suggestable: false,

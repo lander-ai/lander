@@ -77,7 +77,11 @@ export const CommandTile: Component<Props> = (props) => {
         </Text.Caption>
       </div>
       <Text.Caption color="gray">
-        {props.command.type === CommandType.AI ? "AI" : "Open"}
+        {props.command.type === CommandType.AI
+          ? "AI"
+          : props.command.type === CommandType.Lander
+          ? "Lander"
+          : "Open"}
       </Text.Caption>
     </SWrapper>
   );
