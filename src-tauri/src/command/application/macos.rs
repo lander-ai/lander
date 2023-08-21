@@ -77,7 +77,7 @@ fn get_application_from_path(path: &Path) -> Application {
 
     let bundle_id = get_key_from_plist(&plist, "CFBundleIdentifier").unwrap_or("".to_string());
 
-    let name = path
+    let mut name = path
         .to_str()
         .unwrap()
         .split("/")
@@ -85,6 +85,10 @@ fn get_application_from_path(path: &Path) -> Application {
         .unwrap()
         .replace(".app", "")
         .to_string();
+
+    if bundle_id == "com.apple.findmy" {
+        name = "Find My".to_string()
+    }
 
     let icon = get_icon_path(path).unwrap().display().to_string();
 
