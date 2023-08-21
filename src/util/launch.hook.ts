@@ -37,7 +37,6 @@ export const useLaunch = () => {
     setCommandSection,
     setCommandSections,
     setFocusedApplication,
-    setHighlightedCommand,
     commandSections,
   } = commandStore;
   const {
@@ -180,8 +179,6 @@ export const useLaunch = () => {
       });
 
       batch(() => {
-        setHighlightedCommand(undefined);
-
         if (!isOffline()) {
           setFocusedApplication(focusedApplication);
           setCommandSection(CommandType.AI, aiCommandSection);
