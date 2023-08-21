@@ -51,7 +51,10 @@ export const SettingsAccountDefault: Component<Props> = (props) => {
             ✓ Free forever
           </Text.Body>
           <Text.Body mt="8px" color="gray">
-            ✓ App launcher
+            ✓ App Launcher
+          </Text.Body>
+          <Text.Body mt="8px" color="gray">
+            ✓ Smart Calculator
           </Text.Body>
           <Text.Body mt="8px" color="gray">
             ✓ AI Commands
