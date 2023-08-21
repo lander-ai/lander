@@ -24,7 +24,7 @@ import { ChatCommand } from "./chat-command.component";
 import { ChatMessage } from "./chat-message.component";
 
 const SWrapper = styled("div")`
-  height: calc(100% - 85px);
+  height: calc(100% - 102px);
   overflow-y: scroll;
 
   &::-webkit-scrollbar {
@@ -39,8 +39,6 @@ const SLimitWrapper = styled("div")`
   grid-auto-flow: column;
   justify-content: space-between;
 `;
-
-let isScrollBlocked = false;
 
 export const ChatView: Component = () => {
   const user = useUser();
@@ -65,10 +63,6 @@ export const ChatView: Component = () => {
   } = chatStore;
 
   const [isAutoScroll, setIsAutoScroll] = createSignal(true);
-
-  onMount(() => {
-    isScrollBlocked = false;
-  });
 
   let wrapperRef: HTMLDivElement | undefined;
 
@@ -173,7 +167,7 @@ export const ChatView: Component = () => {
   });
 
   createEffect(() => {
-    if (isScrollBlocked) {
+    if (isMouseActive()) {
       return;
     }
 
@@ -207,7 +201,7 @@ export const ChatView: Component = () => {
         return;
       }
 
-      const headerHeight = 50;
+      const headerHeight = 70;
 
       if (
         highlightedElement.parentNode?.querySelector("[id]") ===
@@ -222,8 +216,6 @@ export const ChatView: Component = () => {
         });
       }
     }
-
-    isScrollBlocked = isMouseActive();
   });
 
   const chatCountText = createMemo(() => {

@@ -35,6 +35,7 @@ const SContentWrapper = styled("div")`
   border-radius: 12px;
   padding: 24px;
   background: ${(props) => props.theme?.colors.gray6};
+  border: 1px solid ${(props) => props.theme?.colors.gray4};
   max-width: 50%;
 `;
 

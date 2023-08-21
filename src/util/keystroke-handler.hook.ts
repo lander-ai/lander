@@ -90,7 +90,7 @@ export const useKeystrokeHandler = () => {
             );
 
             if (prevIndex === -1) {
-              return messages[messages.length - 1];
+              return messages[0];
             }
 
             if (
@@ -159,6 +159,10 @@ export const useKeystrokeHandler = () => {
             const commands = query()
               ? searchResults()
               : commandSections().flatMap((c) => c.commands);
+
+            if (!commands) {
+              return prev;
+            }
 
             const prevIndex = commands.findIndex((r) => r.id === prev?.id);
 

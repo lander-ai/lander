@@ -13,30 +13,26 @@ import { router, ThemeMode, themeStore, View } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { cssTheme, useKeystrokeHandler, useLaunch } from "~/util";
 
-const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
+const SWrapper = styled("div")`
   width: ${__macos__ ? "100vw" : "calc(100vw - 1px)"};
   height: ${__macos__ ? "100vh" : "calc(100vh - 1px)"};
   box-sizing: border-box;
-  border-radius: 12px;
-  border: 0.5px solid ${(props) => props.theme?.colors.gray2};
   position: relative;
   overflow: hidden;
-
-  ${(props) =>
-    __macos__
-      ? cssTheme(
-          props.themeMode,
-          "background: rgba(29, 29, 32, 0.8)",
-          "background: rgba(215, 220, 228, 0.8)"
-        )
-      : cssTheme(
-          props.themeMode,
-          "background: rgba(19, 19, 22, 1)",
-          "background: rgba(215, 220, 228, 1)"
-        )};
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 `;
 
-const SContentWrapper = styled("div")<{ view: View }>`
+const SContentWrapper = styled("div")<{ themeMode: ThemeMode }>`
+  margin-top: 12px;
+  border-radius: 12px;
+  border: 1px solid ${(props) => props.theme?.colors.gray2};
+
+  ${(props) =>
+    cssTheme(props.themeMode, "background: #19191a", "background: #e6eaf0")};
+`;
+
+const SPageWrapper = styled("div")<{ view: View; themeMode: ThemeMode }>`
   display: grid;
   grid-template-columns: 100% 100%;
   grid-template-rows: 100vh;
@@ -55,17 +51,21 @@ export const MainWindow: Component = () => {
   useLaunch();
 
   return (
-    <SWrapper themeMode={themeMode()}>
+    <SWrapper>
       <Header />
-      <SContentWrapper view={view()}>
-        <Show when={!isArchiveVisible()}>
-          <ChatView />
-        </Show>
-        <Show when={isArchiveVisible()}>
-          <ChatArchiveView />
-        </Show>
-        <CommandView />
+
+      <SContentWrapper themeMode={themeMode()}>
+        <SPageWrapper view={view()} themeMode={themeMode()}>
+          <Show when={!isArchiveVisible()}>
+            <ChatView />
+          </Show>
+          <Show when={isArchiveVisible()}>
+            <ChatArchiveView />
+          </Show>
+          <CommandView />
+        </SPageWrapper>
       </SContentWrapper>
+
       <Footer />
 
       <ChatPluginPanel visible={isPluginsPanelVisible()} />

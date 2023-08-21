@@ -14,7 +14,7 @@ const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
   left: 0;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 0.5px solid ${(props) => props.theme?.colors.gray2};
+  border: 1px solid ${(props) => props.theme?.colors.gray2};
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   display: grid;

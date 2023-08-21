@@ -6,7 +6,7 @@ import { CommandOverview } from "./command-overview.component";
 import { CommandSearchView } from "./command-search-view.component";
 
 const SWrapper = styled("div")`
-  height: calc(100% - 56px);
+  height: calc(100% - 72px);
   overflow-y: scroll;
 
   &::-webkit-scrollbar {
@@ -57,7 +57,7 @@ export const CommandView: Component = () => {
       }
 
       const footerHeight = 36;
-      const headerHeight = 50;
+      const headerHeight = 70;
       const scrollPadding = 12;
       const commmandTileHeight = highlightedElementHeight;
       const prevY = prevScrollY;
@@ -122,8 +122,8 @@ export const CommandView: Component = () => {
             highlightedElementY +
             scrollY -
             wrapperHeight +
-            commmandTileHeight / 2 +
-            scrollPadding,
+            commmandTileHeight -
+            scrollPadding * 2,
         });
       }
     }

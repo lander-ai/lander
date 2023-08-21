@@ -22,6 +22,7 @@ const SSearchInput = styled("input")`
   background: transparent;
   border: none;
   outline: none;
+  cursor: text;
 
   &::placeholder {
     color: ${(props) => props.theme?.colors.gray};
