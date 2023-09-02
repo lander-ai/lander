@@ -7,6 +7,7 @@ export enum CommandType {
   AI = "ai",
   Application = "application",
   Suggestion = "suggestion",
+  Search = "search",
   Lander = "lander",
 }
 

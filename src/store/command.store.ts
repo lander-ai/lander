@@ -6,7 +6,9 @@ export const commandStore = createRoot(() => {
   const [commandSections, mutateCommandSections] = createSignal<
     CommandSection[]
   >([]);
-  const [searchResults, setSearchResults] = createSignal<Command[]>([]);
+  const [searchResults, setSearchResults] = createSignal<
+    Command[] | undefined
+  >();
   const [focusedApplication, setFocusedApplication] =
     createSignal<Application>();
   const [highlightedCommand, setHighlightedCommand] = createSignal<Command>();

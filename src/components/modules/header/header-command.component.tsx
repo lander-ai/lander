@@ -22,6 +22,7 @@ const SSearchInput = styled("input")`
   background: transparent;
   border: none;
   outline: none;
+  cursor: text;
 
   &::placeholder {
     color: ${(props) => props.theme?.colors.gray};
@@ -89,7 +90,7 @@ export const HeaderCommand: Component = () => {
 
     if (!q) {
       batch(() => {
-        setSearchResults([]);
+        setSearchResults(undefined);
         setHighlightedCommand(commandSections()?.[0]?.commands?.[0]);
         setCalculationResult(undefined);
       });
@@ -142,8 +143,10 @@ export const HeaderCommand: Component = () => {
           })
         : results;
 
+    const searchResults = sortedResult.map((r) => r.item);
+
     batch(() => {
-      setSearchResults(sortedResult.map((r) => r.item));
+      setSearchResults(searchResults);
       setHighlightedCommand(sortedResult[0]?.item);
     });
   };

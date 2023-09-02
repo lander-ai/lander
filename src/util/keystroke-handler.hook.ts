@@ -13,6 +13,7 @@ import {
 } from "~/store";
 import { chatStore } from "~/store/chat.store";
 import { networkStore } from "~/store/network.store";
+import { getSystemSearchCommands } from "./system-search-commands";
 
 export const useKeystrokeHandler = () => {
   const { isMouseActive } = mouseStore;
@@ -90,7 +91,7 @@ export const useKeystrokeHandler = () => {
             );
 
             if (prevIndex === -1) {
-              return messages[messages.length - 1];
+              return messages[0];
             }
 
             if (
@@ -158,7 +159,13 @@ export const useKeystrokeHandler = () => {
           setHighlightedCommand((prev) => {
             const commands = query()
               ? searchResults()
+                ? [...searchResults()!, ...getSystemSearchCommands(query())]
+                : []
               : commandSections().flatMap((c) => c.commands);
+
+            if (!commands) {
+              return prev;
+            }
 
             const prevIndex = commands.findIndex((r) => r.id === prev?.id);
 

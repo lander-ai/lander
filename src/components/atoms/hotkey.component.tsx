@@ -14,7 +14,7 @@ import { Icon } from "./icon.component";
 import { Link } from "./link.component";
 import { Text } from "./text.component";
 
-let isSetsEqual = (a: Set<unknown>, b: Set<unknown>) => {
+const isSetsEqual = (a: Set<unknown>, b: Set<unknown>) => {
   return a.size === b.size && [...a].every((value) => b.has(value));
 };
 
@@ -32,7 +32,6 @@ const SListenerWrapper = styled("div")`
   display: grid;
   align-items: center;
   min-width: 100px;
-  background: ${(props) => props.theme?.colors.gray5};
   border: ${(props) => `0.5px solid ${props.theme?.colors.gray3}`};
   border-radius: 4px;
   display: grid;

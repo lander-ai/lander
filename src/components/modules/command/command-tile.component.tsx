@@ -12,18 +12,17 @@ const SWrapper = styled("div")<{ hoverEnabled: boolean; highlighted: boolean }>`
   align-items: center;
   padding: 8px 12px;
   border-radius: 8px;
+  background: ${(props) =>
+    props.highlighted ? props.theme?.colors.gray4 : undefined};
 
   &:hover {
     background: ${(props) =>
-      props.hoverEnabled ? `${props.theme?.colors.gray}22` : undefined};
+      props.hoverEnabled ? props.theme?.colors.gray3 : undefined};
   }
 
   &:active {
-    background: ${(props) => props.theme?.colors.gray}33;
+    background: ${(props) => props.theme?.colors.gray4};
   }
-
-  background: ${(props) =>
-    props.highlighted ? `${props.theme?.colors.gray}33` : undefined};
 `;
 
 const SApplicationIcon = styled("img")`
@@ -77,7 +76,13 @@ export const CommandTile: Component<Props> = (props) => {
         </Text.Caption>
       </div>
       <Text.Caption color="gray">
-        {props.command.type === CommandType.AI ? "AI" : "Open"}
+        {props.command.type === CommandType.AI
+          ? "AI"
+          : props.command.type === CommandType.Search
+          ? "Search"
+          : props.command.type === CommandType.Lander
+          ? "Lander"
+          : "Open"}
       </Text.Caption>
     </SWrapper>
   );

@@ -11,9 +11,6 @@ use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_store::{with_store, StoreCollection};
 use webdriver_install::Driver;
 
-#[cfg(target_os = "macos")]
-use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
-
 mod command;
 mod cortex;
 mod panel;
@@ -24,7 +21,7 @@ mod util;
 fn main() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
-            MacosLauncher::LaunchAgent,
+            MacosLauncher::AppleScript,
             None,
         ))
         .plugin(tauri_plugin_store::Builder::default().build())
@@ -147,15 +144,6 @@ fn main() {
                             }))
                             .unwrap();
                     }
-
-                    #[cfg(target_os = "macos")]
-                    apply_vibrancy(
-                        &main_window,
-                        NSVisualEffectMaterial::UnderWindowBackground,
-                        None,
-                        Some(12.0),
-                    )
-                    .expect("error applying vibrancy");
 
                     #[cfg(target_os = "windows")]
                     {

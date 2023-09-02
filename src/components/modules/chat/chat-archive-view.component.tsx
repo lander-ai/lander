@@ -11,7 +11,7 @@ import { ChatArchiveSearchTile } from "./chat-archive-search-tile.component";
 import { ChatArchiveThreadTile } from "./chat-archive-thread-tile.component";
 
 const SWrapper = styled("div")`
-  height: calc(100% - 112px);
+  height: calc(100% - 128px);
   overflow-y: scroll;
   padding: 12px;
   display: grid;
@@ -101,9 +101,9 @@ export const ChatArchiveView: Component = () => {
       }
 
       const footerHeight = 43;
-      const headerHeight = 50;
-      const scrollPadding = 0;
-      const commmandTileHeight = highlightedElementHeight;
+      const headerHeight = 70;
+      const scrollPadding = 46;
+      const tileHeight = highlightedElementHeight;
       const prevY = prevScrollY;
 
       prevScrollY = highlightedElementY;
@@ -112,9 +112,14 @@ export const ChatArchiveView: Component = () => {
         (highlightedElementY <= prevY || highlightedElementY <= headerHeight) &&
         highlightedElementY < wrapperHeight - footerHeight
       ) {
-        if (highlightedElementY < headerHeight + scrollPadding) {
+        if (!highlightedElement.parentElement?.previousSibling) {
+          wrapperRef.scrollTo({ top: 0 });
+          return;
+        }
+
+        if (highlightedElementY < headerHeight) {
           wrapperRef.scrollTo({
-            top: highlightedElementY + scrollY - headerHeight + scrollPadding,
+            top: highlightedElementY + scrollY - headerHeight,
           });
         }
 
@@ -122,7 +127,7 @@ export const ChatArchiveView: Component = () => {
       }
 
       if (highlightedElementY > wrapperHeight - footerHeight) {
-        if (!highlightedElement.nextSibling) {
+        if (!highlightedElement.parentElement?.nextSibling) {
           wrapperRef.scrollTo({ top: Number.MAX_SAFE_INTEGER });
           return;
         }
@@ -132,7 +137,7 @@ export const ChatArchiveView: Component = () => {
             highlightedElementY +
             scrollY -
             wrapperHeight +
-            commmandTileHeight / 2 +
+            tileHeight -
             scrollPadding,
         });
       }

@@ -6,10 +6,7 @@ use tauri::{
 use tauri_plugin_store::{with_store, StoreCollection};
 
 #[cfg(target_os = "macos")]
-use {
-    cocoa::appkit::NSApplicationActivationPolicy,
-    window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial},
-};
+use cocoa::appkit::NSApplicationActivationPolicy;
 
 pub fn handle_open_settings_window(app_handle: AppHandle<Wry>, view: Option<String>) {
     #[cfg(target_os = "macos")]
@@ -44,7 +41,7 @@ pub fn handle_open_settings_window(app_handle: AppHandle<Wry>, view: Option<Stri
         #[cfg(target_os = "macos")]
         {
             settings_window_builder =
-                settings_window_builder.title_bar_style(tauri::TitleBarStyle::Overlay);
+                settings_window_builder.title_bar_style(tauri::TitleBarStyle::Visible);
         }
 
         let settings_window = settings_window_builder.build().unwrap();
@@ -78,15 +75,6 @@ pub fn handle_open_settings_window(app_handle: AppHandle<Wry>, view: Option<Stri
                 }))
                 .unwrap();
         }
-
-        #[cfg(target_os = "macos")]
-        apply_vibrancy(
-            &settings_window,
-            NSVisualEffectMaterial::UnderWindowBackground,
-            None,
-            Some(12.0),
-        )
-        .expect("error applying vibrancy");
 
         settings_window.on_window_event(move |event| match event {
             WindowEvent::Destroyed { .. } => {

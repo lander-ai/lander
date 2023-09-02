@@ -13,22 +13,9 @@ const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
   width: 100vw;
   height: 100vh;
   box-sizing: border-box;
-  border-radius: ${__macos__ ? "12px" : "0"};
-  border: ${(props) =>
-    __macos__ ? "0.5px solid props.theme?.colors.gray2" : undefined};
 
   ${(props) =>
-    __macos__
-      ? cssTheme(
-          props.themeMode,
-          "background: rgba(29, 29, 32, 0.8)",
-          "background: rgba(215, 220, 228, 0.8)"
-        )
-      : cssTheme(
-          props.themeMode,
-          "background: rgba(19, 19, 22, 1)",
-          "background: rgba(215, 220, 228, 1)"
-        )};
+    cssTheme(props.themeMode, "background: #19191a", "background: #e6eaf0")}
 `;
 
 const SContentWrapper = styled("div")`

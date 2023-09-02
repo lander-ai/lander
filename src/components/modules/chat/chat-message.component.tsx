@@ -20,7 +20,7 @@ import { ChatMessageMenu } from "./chat-message-menu.component";
 
 const SWrapper = styled("div")<{ hoverEnabled: boolean; selected?: boolean }>`
   background: ${(props) =>
-    props.selected ? `${props.theme?.colors.background}14` : undefined};
+    props.selected ? props.theme?.colors.gray5 : undefined};
 `;
 
 const SContentWrapper = styled("div")`

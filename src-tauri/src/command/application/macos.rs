@@ -8,7 +8,6 @@ use block::ConcreteBlock;
 use cocoa::appkit::NSApplicationActivationPolicy;
 use cocoa::foundation::NSInteger;
 use cocoa::{base::nil, foundation::NSUInteger};
-
 use core_foundation::{
     array::CFArray,
     base::{FromVoid, TCFType, ToVoid},
@@ -16,12 +15,14 @@ use core_foundation::{
     string::CFString,
 };
 use directories::ProjectDirs;
+use dirs;
 use objc::{
     msg_send,
     runtime::{Class, Object},
     sel, sel_impl,
 };
 use plist::{Dictionary, Value};
+use regex::Regex;
 use std::sync::Mutex;
 use std::{
     ffi::c_void,
@@ -35,25 +36,32 @@ use crate::command::application::Application;
 pub struct State(pub Mutex<Option<()>>);
 
 fn search_for_applications(path: &Path) -> Vec<PathBuf> {
-    use regex::Regex;
-
     if path.display().to_string().ends_with(".app") {
         vec![path.to_path_buf()]
     } else {
-        fs::read_dir(path)
-            .unwrap()
-            .filter_map(|entry| entry.ok())
-            .map(|entry| entry.path())
-            .flat_map(
-                |subpath| match (subpath.is_dir(), subpath.display().to_string()) {
-                    (true, path_str) if path_str.ends_with(".app") => vec![subpath],
-                    (true, path_str) if !Regex::new(r"\.[a-z]*$").unwrap().is_match(&path_str) => {
-                        search_for_applications(&subpath)
-                    }
-                    _ => vec![],
-                },
-            )
-            .collect()
+        if path.is_dir() {
+            fs::read_dir(path)
+                .unwrap()
+                .filter_map(|entry| entry.ok())
+                .map(|entry| entry.path())
+                .flat_map(
+                    |subpath| match (subpath.is_dir(), subpath.display().to_string()) {
+                        (true, path_str) if path_str.ends_with(".app") => vec![subpath],
+                        (true, path_str)
+                            if !Regex::new(r"\.[a-z]*$").unwrap().is_match(&path_str)
+                                || path_str.ends_with(".localized") =>
+                        {
+                            search_for_applications(&subpath)
+                        }
+                        _ => {
+                            vec![]
+                        }
+                    },
+                )
+                .collect()
+        } else {
+            vec![]
+        }
     }
 }
 
@@ -77,7 +85,7 @@ fn get_application_from_path(path: &Path) -> Application {
 
     let bundle_id = get_key_from_plist(&plist, "CFBundleIdentifier").unwrap_or("".to_string());
 
-    let name = path
+    let mut name = path
         .to_str()
         .unwrap()
         .split("/")
@@ -85,6 +93,10 @@ fn get_application_from_path(path: &Path) -> Application {
         .unwrap()
         .replace(".app", "")
         .to_string();
+
+    if bundle_id == "com.apple.findmy" {
+        name = "Find My".to_string()
+    }
 
     let icon = get_icon_path(path).unwrap().display().to_string();
 
@@ -105,6 +117,7 @@ pub fn get_application_paths() -> Vec<PathBuf> {
         Path::new("/System/Library/CoreServices/Finder.app"),
         Path::new("/Applications/"),
         Path::new("/System/Applications/"),
+        &dirs::home_dir().unwrap().join("Applications"),
     ]
     .iter()
     .flat_map(|path| search_for_applications(path))

@@ -34,18 +34,17 @@ const SMessageWrapper = styled("div")<SMessageWrapperProps>`
   align-items: center;
   padding: 8px 12px;
   border-radius: 8px;
+  background: ${(props) =>
+    props.highlighted ? props.theme?.colors.gray4 : undefined};
 
   &:hover {
     background: ${(props) =>
-      props.hoverEnabled ? `${props.theme?.colors.gray}22` : undefined};
+      props.hoverEnabled ? props.theme?.colors.gray3 : undefined};
   }
 
   &:active {
-    background: ${(props) => props.theme?.colors.gray}33;
+    background: ${(props) => props.theme?.colors.gray4};
   }
-
-  background: ${(props) =>
-    props.highlighted ? `${props.theme?.colors.gray}33` : undefined};
 `;
 
 const STitle = styled(Text.Callout)`

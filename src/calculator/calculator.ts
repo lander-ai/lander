@@ -157,7 +157,10 @@ class Calculator {
         : undefined;
 
     if (countryValue) {
-      return new CalculatorCountryToken(countryValue.name, countryValue);
+      const token = new CalculatorCountryToken(countryValue.name, countryValue);
+      token.displayDefault = input.length > 2;
+
+      return token;
     }
 
     const timezoneValue =
@@ -588,20 +591,22 @@ class Calculator {
   }
 
   async refreshCurrencyData() {
-    const { response } = await NetworkService.shared.load(
-      CurrencyRates,
-      CurrencyRates.requests.rates
-    );
+    try {
+      const { response } = await NetworkService.shared.load(
+        CurrencyRates,
+        CurrencyRates.requests.rates
+      );
 
-    const data = response.data.data;
+      const data = response.data.data;
 
-    const currencyData: Record<string, CurrencyRate> = {};
+      const currencyData: Record<string, CurrencyRate> = {};
 
-    data.forEach((currency) => {
-      currencyData[currency.code] = currency;
-    });
+      data.forEach((currency) => {
+        currencyData[currency.code] = currency;
+      });
 
-    this.currencyData = currencyData;
+      this.currencyData = currencyData;
+    } catch {}
   }
 
   evaluate(input: string): CalculatorResult | undefined {
@@ -634,7 +639,6 @@ class Calculator {
     ) {
       try {
         result = result.convert("best");
-        // eslint-disable-next-line no-empty
       } catch {}
     }
 

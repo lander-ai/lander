@@ -6,9 +6,9 @@ export const theme = {
     orange: "#cf7430",
     green: "#1e660f",
     gray: "#636369",
-    gray2: "#afafb6",
-    gray3: "#bdbdc2",
-    gray4: "#cacace",
+    gray2: "#bdbdc2",
+    gray3: "#cacace",
+    gray4: "#d8d8da",
     gray5: "#d8d8da",
     gray6: "#e5e5e6",
     modes: {
