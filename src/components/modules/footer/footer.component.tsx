@@ -15,6 +15,7 @@ const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid ${(props) => props.theme?.colors.gray2};
+  border-top: 0.5px solid ${(props) => props.theme?.colors.gray2};
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   display: grid;
@@ -23,8 +24,8 @@ const SWrapper = styled("div")<{ themeMode: ThemeMode }>`
   ${(props) =>
     cssTheme(
       props.themeMode,
-      "background: 'linear-gradient(90deg, rgba(64, 59, 59, 0.2) 40%, rgb(26, 25, 25, 0.6) 100%)'",
-      "background: 'linear-gradient(90deg, rgba(255, 236, 236, 0.2) 40%, rgb(255, 236, 236, 0.6) 100%)'"
+      "background: linear-gradient(90deg, rgba(86, 79, 79, 0.2) 40%, rgb(26, 25, 25, 0.6) 100%)",
+      "background: linear-gradient(90deg, rgba(168, 174, 201, 0.2) 40%, rgb(255, 236, 236, 0.6) 100%)"
     )};
 `;
 
