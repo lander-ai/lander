@@ -1,5 +1,25 @@
 
 
+## [0.0.1-preview.9](https://github.com/lander-ai/lander/compare/v0.0.1-preview.8...v0.0.1-preview.9) (2023-09-02)
+
+
+### Bug Fixes
+
+* add user applications path ([b925e4f](https://github.com/lander-ai/lander/commit/b925e4ff35f460986b18258d5112f393525ff61c))
+* change autostart method to apple script ([5d88328](https://github.com/lander-ai/lander/commit/5d883284ef44bf022034ce36287f1b4287c797f2))
+* find my name ([d463424](https://github.com/lander-ai/lander/commit/d463424c0400169582a5e56b67ac8201ae9d0d75))
+* flickering of highlighted command ([f0ed2bd](https://github.com/lander-ai/lander/commit/f0ed2bd5f98dcc41cd49682860f7b721fd3d0c19))
+* hide iso country code displaying result ([d83f14f](https://github.com/lander-ai/lander/commit/d83f14f820bb85df7b13ceb9fc1cdbdac18cba40))
+* lander command action text ([f3dd489](https://github.com/lander-ai/lander/commit/f3dd4895fc432706ceab23279e3a88271361f978))
+* no internet startup crash ([b082a4d](https://github.com/lander-ai/lander/commit/b082a4dafd8a2842c64d21890ab60ca3d33f5245))
+
+
+### Features
+
+* add web search ([dfc4d26](https://github.com/lander-ai/lander/commit/dfc4d267c6782c576105947b2b167d311fd5ceb8))
+* refresh layout ([4acddc9](https://github.com/lander-ai/lander/commit/4acddc97c898337ec5b55d2b0a6c06744d751b02))
+* update core features copy ([1df8b14](https://github.com/lander-ai/lander/commit/1df8b14d82fdb8bf21ceb0444035446a46ffec80))
+
 ## [0.0.1-preview.8](https://github.com/lander-ai/lander/compare/v0.0.1-preview.7...v0.0.1-preview.8) (2023-08-05)
 
 
