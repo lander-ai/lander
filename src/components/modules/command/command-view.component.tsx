@@ -145,7 +145,7 @@ export const CommandView: Component = () => {
       </Show>
 
       <Switch fallback={<CommandOverview />}>
-        <Match when={searchResults().length}>
+        <Match when={searchResults()}>
           <CommandSearchView />
         </Match>
       </Switch>
