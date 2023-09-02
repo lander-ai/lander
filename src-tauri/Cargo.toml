@@ -33,6 +33,7 @@ fantoccini = "0.20.0-rc.4"
 portpicker = "0.1.1"
 webdriver-install = "0.3.2"
 twox-hash = "1.6.3"
+dirs = "5.0.1"
 
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.24.1"
